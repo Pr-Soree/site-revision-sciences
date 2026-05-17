@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Principes Actifs – UAA4 Esthétique</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161923;
+    --surface2: #1e2330;
+    --border: #2a3045;
+    --accent: #c8a96e;
+    --accent2: #7ecfb3;
+    --accent3: #e07a8a;
+    --text: #e8eaf0;
+    --text-muted: #7a8099;
+    --correct: #4caf82;
+    --wrong: #e07a8a;
+    --gold: #f0c060;
+    --silver: #b0b8cc;
+    --bronze: #c87a50;
+    --radius: 14px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(200,169,110,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(126,207,179,0.05) 0%, transparent 50%);
+  }
+  h1, h2, h3 { font-family: 'Syne', sans-serif; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 32px; max-width: 700px; width: 100%; }
+  .header .badge {
+    display: inline-block; font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent);
+    padding: 4px 14px; border-radius: 100px; margin-bottom: 16px;
+  }
+  .header h1 { font-size: clamp(22px, 4vw, 36px); font-weight: 800; line-height: 1.15; margin-bottom: 8px; }
+  .header h1 span { color: var(--accent); }
+  .header p { font-size: 14px; color: var(--text-muted); font-weight: 300; }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px;
+    max-width: 700px; width: 100%; box-shadow: var(--shadow);
+  }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* START */
+  #start-screen .intro-text { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.7; }
+  #start-screen .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .rule-item {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .rule-item .icon { font-size: 18px; flex-shrink: 0; }
+  .rule-item strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
+
+  .name-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .name-group label {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+  }
+  .name-group .label-hint { font-size: 12px; color: var(--text-muted); font-style: italic; }
+  .name-group input {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px;
+    padding: 14px 16px; outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .name-group input:focus { border-color: var(--accent); }
+  .name-group input::placeholder { color: var(--text-muted); }
+
+  .training-badge {
+    display: none; text-align: center; font-size: 12px; color: var(--accent2);
+    background: rgba(126,207,179,0.08); border: 1px solid rgba(126,207,179,0.2);
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 16px;
+  }
+  .training-badge.show { display: block; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; border: none;
+    border-radius: 10px; padding: 14px 28px; cursor: pointer; transition: all 0.2s; width: 100%;
+  }
+  .btn-primary { background: var(--accent); color: #0d0f14; }
+  .btn-primary:hover { background: #d4b87a; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,169,110,0.3); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); margin-top: 12px; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* QUIZ */
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 10px; }
+  .q-counter { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+  .q-counter span { color: var(--accent); }
+  .score-live {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent2);
+    background: rgba(126,207,179,0.1); padding: 5px 12px; border-radius: 100px; border: 1px solid rgba(126,207,179,0.2);
+  }
+
+  /* TIMER */
+  .timer-bar-wrap { height: 4px; background: var(--surface2); border-radius: 2px; margin-bottom: 24px; overflow: hidden; }
+  .timer-bar { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 2px; transition: width 0.1s linear, background 0.5s; width: 100%; }
+  .timer-bar.warning { background: linear-gradient(90deg, var(--accent3), #f0a040); }
+  .timer-text { text-align: center; font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 20px; color: var(--text); transition: color 0.3s; }
+  .timer-text.warning { color: var(--accent3); }
+
+  /* QUESTION */
+  .category-tag {
+    display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--accent); background: rgba(200,169,110,0.1);
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 14px;
+  }
+  .question-text { font-family: 'Syne', sans-serif; font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; line-height: 1.45; margin-bottom: 24px; }
+
+  /* OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .option-btn {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    padding: 14px 18px; text-align: left; cursor: pointer; transition: all 0.18s;
+    display: flex; align-items: center; gap: 14px; line-height: 1.4;
+  }
+  .option-btn .opt-letter {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800; color: var(--text-muted);
+    background: var(--surface); width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(200,169,110,0.06); transform: translateX(3px); }
+  .option-btn:hover:not(:disabled) .opt-letter { background: var(--accent); color: #0d0f14; }
+  .option-btn.correct { border-color: var(--correct); background: rgba(76,175,130,0.1); animation: pulse-correct 0.4s ease; }
+  .option-btn.correct .opt-letter { background: var(--correct); color: #fff; }
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(224,122,138,0.1); animation: shake 0.35s ease; }
+  .option-btn.wrong .opt-letter { background: var(--wrong); color: #fff; }
+  .option-btn:disabled { cursor: not-allowed; opacity: 0.6; transform: none !important; }
+  .option-btn.correct:disabled, .option-btn.wrong:disabled { opacity: 1; }
+
+  @keyframes pulse-correct { 0%,100%{transform:scale(1)} 50%{transform:scale(1.015)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+  /* EXPLANATION */
+  .explanation {
+    background: var(--surface2); border-left: 3px solid var(--accent2);
+    border-radius: 0 10px 10px 0; padding: 14px 16px; font-size: 13px;
+    color: var(--text-muted); line-height: 1.6; display: none; margin-bottom: 16px;
+  }
+  .explanation.show { display: block; animation: fadeIn 0.3s ease; }
+  .explanation strong { color: var(--accent2); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  /* POINTS FLASH */
+  .points-flash { text-align: center; font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; display: none; animation: popIn 0.5s ease; }
+  .points-flash.show { display: block; }
+  .points-flash.positive { color: var(--correct); }
+  .points-flash.negative { color: var(--wrong); }
+  @keyframes popIn { 0%{transform:scale(0.5);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+
+  /* RESULTS */
+  .result-hero { text-align: center; margin-bottom: 28px; }
+  .result-emoji { font-size: 52px; margin-bottom: 12px; }
+  .result-hero h2 { font-size: clamp(20px, 3vw, 28px); font-weight: 800; margin-bottom: 8px; }
+  .player-name { color: var(--accent); }
+
+  .score-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .score-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 12px; text-align: center; }
+  .score-item .val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--accent); display: block; }
+  .score-item .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  .final-score-box {
+    background: linear-gradient(135deg, rgba(200,169,110,0.12), rgba(126,207,179,0.08));
+    border: 1px solid var(--accent); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;
+  }
+  .final-score-box .total-pts { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .final-score-box .pts-label { font-size: 12px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+
+  .training-result-msg {
+    text-align: center; font-size: 13px; color: var(--accent2);
+    background: rgba(126,207,179,0.08); border: 1px solid rgba(126,207,179,0.2);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-style: italic;
+  }
+
+  /* LEADERBOARD */
+  .leaderboard-title {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .leaderboard-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .leaderboard { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .lb-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .lb-row.highlight { border-color: var(--accent); background: rgba(200,169,110,0.07); }
+  .lb-rank { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; width: 26px; text-align: center; flex-shrink: 0; }
+  .lb-rank.r1 { color: var(--gold); }
+  .lb-rank.r2 { color: var(--silver); }
+  .lb-rank.r3 { color: var(--bronze); }
+  .lb-rank.rn { color: var(--text-muted); }
+  .lb-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .lb-score { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--accent); }
+  .lb-correct { font-size: 12px; color: var(--text-muted); }
+  .lb-empty { text-align: center; color: var(--text-muted); font-size: 14px; padding: 16px; font-style: italic; }
+  .lb-loading { text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px; }
+  .lb-error {
+    text-align: center; font-size: 13px; color: var(--accent3);
+    background: rgba(224,122,138,0.08); border: 1px solid rgba(224,122,138,0.2);
+    border-radius: 8px; padding: 10px 14px;
+  }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface2); border-radius: 10px; padding: 4px; }
+  .tab-btn {
+    flex: 1; background: transparent; border: none; color: var(--text-muted);
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; padding: 10px; border-radius: 7px; cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--surface); color: var(--text); }
+
+  /* REVIEW */
+  .review-item { margin-bottom: 14px; background: var(--surface2); border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+  .review-item .rev-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .review-item .rev-q { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .review-item .rev-exp { font-size: 13px; color: var(--accent2); border-left: 2px solid var(--accent2); padding-left: 10px; }
+
+  @media(max-width: 520px) {
+    .card { padding: 20px 16px; }
+    #start-screen .rules { grid-template-columns: 1fr; }
+    .score-breakdown { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Sciences Appliquées · 5EQ Esthétique</div>
+  <h1>Principes Actifs<br><span>UAA 4 — Modelage Corps</span></h1>
+  <p>Révise et compare-toi à tes camarades !</p>
+</div>
+
+<!-- START -->
+<div id="start-screen" class="card screen active">
+  <p class="intro-text">
+    Chaque partie tire <strong>20 questions</strong> au hasard parmi toutes celles de la banque.
+    Réponds vite : plus tu es rapide, plus tu gagnes de points bonus ! 🚀
+  </p>
+  <div class="rules">
+    <div class="rule-item"><span class="icon">✅</span><div><strong>Bonne réponse</strong>+100 pts de base</div></div>
+    <div class="rule-item"><span class="icon">⚡</span><div><strong>Bonus rapidité</strong>jusqu'à +20 pts si réponse rapide</div></div>
+    <div class="rule-item"><span class="icon">⏱️</span><div><strong>20 secondes</strong>par question</div></div>
+    <div class="rule-item"><span class="icon">🏆</span><div><strong>Classement partagé</strong>visible par toute la classe</div></div>
+  </div>
+  <div class="name-group">
+    <label for="player-name">Ton prénom / pseudo</label>
+    <div class="label-hint">Optionnel — laisse vide pour jouer en mode entraînement</div>
+    <input type="text" id="player-name" placeholder="Ex : Marie, Zoé123, ..." maxlength="24" autocomplete="off">
+  </div>
+  <div class="training-badge show" id="training-badge">🎯 Mode entraînement — ton score ne sera pas enregistré</div>
+  <button class="btn btn-primary" onclick="startQuiz()">🎮 Commencer la partie</button>
+  <button class="btn btn-secondary" onclick="toggleLeaderboard()">🏆 Voir le classement</button>
+  <div id="leaderboard-tab" style="display:none; margin-top:24px;">
+    <div class="leaderboard-title">Classement actuel</div>
+    <div id="start-leaderboard" class="leaderboard"></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen" class="card screen">
+  <div class="quiz-meta">
+    <div class="q-counter">Question <span id="q-num">1</span> / 20</div>
+    <div class="score-live" id="score-live">0 pts</div>
+  </div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="timer-text" id="timer-text">20</div>
+  <div class="category-tag" id="q-category"></div>
+  <div class="question-text" id="q-text"></div>
+  <div class="options" id="options"></div>
+  <div class="points-flash" id="points-flash"></div>
+  <div class="explanation" id="explanation"></div>
+  <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none;">Question suivante →</button>
+</div>
+
+<!-- RESULTS -->
+<div id="result-screen" class="card screen">
+  <div class="result-hero">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <h2 id="result-title"></h2>
+  </div>
+  <div class="score-breakdown">
+    <div class="score-item"><span class="val" id="res-correct">0</span><div class="lbl">Bonnes réponses</div></div>
+    <div class="score-item"><span class="val" id="res-base">0</span><div class="lbl">Pts base</div></div>
+    <div class="score-item"><span class="val" id="res-bonus">0</span><div class="lbl">Pts bonus rapidité</div></div>
+  </div>
+  <div class="final-score-box">
+    <div class="total-pts" id="res-total">0</div>
+    <div class="pts-label">Points totaux</div>
+  </div>
+
+  <!-- Mode entraînement -->
+  <div class="training-result-msg" id="training-result-msg" style="display:none;">
+    🎯 Mode entraînement — score non enregistré. Entre ton prénom sur l'écran d'accueil pour figurer au classement !
+  </div>
+
+  <!-- Avec nom : tabs classement + révision -->
+  <div id="result-tabs-wrap" style="display:none;">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this,'tab-lb')">🏆 Classement</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-review')">📋 Révision</button>
+    </div>
+    <div id="tab-lb">
+      <div class="leaderboard-title">Top 10</div>
+      <div id="result-leaderboard" class="leaderboard"></div>
+    </div>
+    <div id="tab-review" style="display:none;"><div id="review-list"></div></div>
+  </div>
+
+  <!-- Sans nom : révision seule -->
+  <div id="training-review-wrap" style="display:none;">
+    <div class="leaderboard-title">Révision</div>
+    <div id="training-review-list"></div>
+  </div>
+
+  <button class="btn btn-primary" style="margin-top:8px;" onclick="resetToStart()">🔄 Nouvelle partie</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// ⚠️  COLLE TON URL APPS SCRIPT ICI
+// ══════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAjGWnlwhxHpto3TCP-WQkNK5uYss9YRg304RP1LsDmTVKyQmCRH_UgFlYEMvU83ny/exec';
+// Exemple : 'https://script.google.com/macros/s/AKfycbx.../exec'
+
+// ══════════════════════════════════════════════
+// BANQUE — 44 questions
+// ══════════════════════════════════════════════
+const ALL_QUESTIONS = [
+  // HUMECTANTS
+  { category:"Principes actifs humectants", question:"À quelle catégorie de principes actifs appartient l'acide hyaluronique ?", options:["Occlusif","Humectant","Émollient","Lipolytique"], correct:1, explanation:"L'acide hyaluronique est un humectant : il attire et retient l'eau dans l'épiderme." },
+  { category:"Principes actifs humectants", question:"À quelle catégorie de principes actifs appartient l'extrait d'Aloe Vera ?", options:["Occlusif et lipolytique","Émollient et occlusif","Humectant et anti-inflammatoire","Lipolytique et décongestionnant/drainant"], correct:2, explanation:"L'extrait d'Aloe Vera appartient à deux catégories : humectant (retient l'eau) et anti-inflammatoire (apaise les irritations)." },
+  { category:"Principes actifs humectants", question:"À quelle catégorie de principes actifs appartient la glycérine ?", options:["Anti-inflammatoire","Humectant","Occlusif","Exfoliant chimique acide"], correct:1, explanation:"La glycérine est un humectant : elle attire les molécules d'eau vers les couches superficielles de l'épiderme." },
+  { category:"Principes actifs humectants", question:"À quelle catégorie de principes actifs appartient l'urée ?", options:["Lipolytique","Décongestionnant/drainant","Humectant","Occlusif"], correct:2, explanation:"L'urée est un humectant naturellement présent dans le facteur naturel d'hydratation (NMF) de la peau." },
+  { category:"Principes actifs humectants", question:"À quelle catégorie de principes actifs appartient le panthénol ?", options:["Occlusif et lipolytique","Humectant et anti-inflammatoire","Émollient et occlusif","Lipolytique et décongestionnant/drainant"], correct:1, explanation:"Le panthénol (vitamine B5) appartient à deux catégories : humectant (retient l'eau) et anti-inflammatoire (apaise la peau irritée)." },
+  // ÉMOLLIENTS
+  { category:"Principes actifs émollients", question:"À quelle catégorie de principes actifs appartient l'huile d'amande douce ?", options:["Occlusif","Humectant","Émollient","Anti-inflammatoire"], correct:2, explanation:"L'huile d'amande douce est un émollient : elle s'intercale entre les cornéocytes et assouplit la peau." },
+  { category:"Principes actifs émollients", question:"À quelle catégorie de principes actifs appartient l'huile de coco ?", options:["Occlusif","Lipolytique","Émollient","Humectant"], correct:2, explanation:"L'huile de coco est un émollient : elle nourrit et assouplit la peau en s'intercalant entre les cornéocytes." },
+  { category:"Principes actifs émollients", question:"À quelle catégorie de principes actifs appartient l'huile de jojoba ?", options:["Lipolytique","Émollient","Exfoliant chimique acide","Occlusif"], correct:1, explanation:"L'huile de jojoba est un émollient : elle assouplit la peau et améliore sa texture." },
+  { category:"Principes actifs émollients", question:"À quelle catégorie de principes actifs appartient le squalane ?", options:["Exfoliant chimique acide","Occlusif","Émollient","Lipolytique"], correct:2, explanation:"Le squalane est un émollient léger qui s'intègre facilement dans l'épiderme et assouplit la peau." },
+  { category:"Principes actifs émollients", question:"À quelle catégorie de principes actifs appartiennent les céramides ?", options:["Occlusif","Humectant","Émollient","Anti-inflammatoire"], correct:2, explanation:"Les céramides sont des émollients : ils reconstituent le ciment lipidique intercellulaire et assouplissent la peau." },
+  // OCCLUSIFS
+  { category:"Principes actifs occlusifs", question:"À quelle catégorie de principes actifs appartient la vaseline ?", options:["Humectant","Occlusif","Émollient","Décongestionnant/drainant"], correct:1, explanation:"La vaseline est un occlusif : elle forme un film imperméable en surface de la peau qui limite la perte insensible en eau." },
+  { category:"Principes actifs occlusifs", question:"À quelle catégorie de principes actifs appartient la cire d'algues ?", options:["Exfoliant mécanique à particules","Humectant","Occlusif","Lipolytique"], correct:2, explanation:"La cire d'algues est un occlusif naturel qui forme un film protecteur en surface de la peau." },
+  { category:"Principes actifs occlusifs", question:"À quelle catégorie de principes actifs appartient l'huile de paraffine ?", options:["Humectant","Émollient","Occlusif","Anti-inflammatoire"], correct:2, explanation:"L'huile de paraffine est un occlusif d'origine minérale qui crée un film protecteur limitant l'évaporation de l'eau." },
+  { category:"Principes actifs occlusifs", question:"À quelle catégorie de principes actifs appartient la cire d'abeille ?", options:["Humectant","Émollient","Occlusif","Anti-inflammatoire"], correct:2, explanation:"La cire d'abeille est un occlusif naturel qui forme un film protecteur en surface de la peau." },
+  { category:"Principes actifs occlusifs", question:"Le beurre de karité appartient à deux catégories de principes actifs. Lesquelles ?", options:["Humectant et anti-inflammatoire","Émollient et occlusif","Lipolytique et occlusif","Émollient et décongestionnant/drainant"], correct:1, explanation:"Le beurre de karité est à la fois émollient (assouplit la peau) et occlusif (forme un film protecteur en surface)." },
+  { category:"Principes actifs occlusifs", question:"Le beurre de mangue appartient à deux catégories de principes actifs. Lesquelles ?", options:["Humectant et lipolytique","Émollient et occlusif","Anti-inflammatoire et humectant","Décongestionnant/drainant et émollient"], correct:1, explanation:"Comme le beurre de karité, le beurre de mangue est à la fois émollient (assouplit) et occlusif (protège la surface cutanée)." },
+  // ANTI-INFLAMMATOIRES
+  { category:"Principes actifs anti-inflammatoires", question:"À quelle catégorie de principes actifs appartient l'extrait de Camomille ?", options:["Décongestionnant/drainant","Anti-inflammatoire","Lipolytique","Humectant"], correct:1, explanation:"L'extrait de Camomille est un anti-inflammatoire : il apaise les rougeurs et les irritations cutanées." },
+  { category:"Principes actifs anti-inflammatoires", question:"À quelle catégorie de principes actifs appartient l'allantoïne ?", options:["Exfoliant chimique acide","Occlusif","Anti-inflammatoire","Lipolytique"], correct:2, explanation:"L'allantoïne est un anti-inflammatoire qui apaise et favorise la cicatrisation de la peau irritée." },
+  { category:"Principes actifs anti-inflammatoires", question:"À quelle catégorie de principes actifs appartient l'extrait de Calendula ?", options:["Humectant","Lipolytique","Anti-inflammatoire","Décongestionnant/drainant"], correct:2, explanation:"L'extrait de Calendula (souci) est un anti-inflammatoire apaisant, très utilisé après épilation." },
+  { category:"Principes actifs anti-inflammatoires", question:"À quelle catégorie de principes actifs appartient l'extrait de Centella Asiatica ?", options:["Lipolytique","Exfoliant chimique enzymatique","Anti-inflammatoire","Occlusif"], correct:2, explanation:"L'extrait de Centella Asiatica est un anti-inflammatoire qui apaise et favorise la régénération cutanée." },
+  { category:"Principes actifs anti-inflammatoires", question:"À quelle catégorie de principes actifs appartient l'extrait de Bleuet ?", options:["Lipolytique","Humectant","Anti-inflammatoire","Décongestionnant/drainant"], correct:2, explanation:"L'extrait de Bleuet est un anti-inflammatoire apaisant, souvent utilisé pour les peaux sensibles et réactives." },
+  // DÉCONGESTIONNANTS/DRAINANTS
+  { category:"Principes actifs décongestionnants/drainants", question:"À quelle catégorie de principes actifs appartient l'extrait de Marron d'Inde ?", options:["Lipolytique","Décongestionnant/drainant","Anti-inflammatoire","Humectant"], correct:1, explanation:"L'extrait de Marron d'Inde est un décongestionnant/drainant : il tonifie les parois veineuses et favorise le retour veineux." },
+  { category:"Principes actifs décongestionnants/drainants", question:"À quelle catégorie de principes actifs appartient l'extrait de Vigne rouge ?", options:["Exfoliant mécanique à particules","Occlusif","Décongestionnant/drainant","Anti-inflammatoire"], correct:2, explanation:"L'extrait de Vigne rouge est un décongestionnant/drainant : il renforce les parois vasculaires et améliore la circulation veineuse de retour." },
+  { category:"Principes actifs décongestionnants/drainants", question:"À quelle catégorie de principes actifs appartient l'extrait de Ginkgo Biloba ?", options:["Lipolytique","Humectant","Décongestionnant/drainant","Exfoliant chimique acide"], correct:2, explanation:"L'extrait de Ginkgo Biloba est un décongestionnant/drainant qui améliore la microcirculation et favorise le retour veineux et lymphatique." },
+  { category:"Principes actifs décongestionnants/drainants", question:"À quelle catégorie de principes actifs appartient l'extrait de Cyprès ?", options:["Anti-inflammatoire","Lipolytique","Décongestionnant/drainant","Occlusif"], correct:2, explanation:"L'extrait de Cyprès est un décongestionnant/drainant qui tonifie les parois veineuses et favorise le retour sanguin et lymphatique." },
+  { category:"Principes actifs décongestionnants/drainants", question:"L'extrait d'Hamamélis appartient à deux catégories de principes actifs. Lesquelles ?", options:["Lipolytique et anti-inflammatoire","Anti-inflammatoire et décongestionnant/drainant","Humectant et occlusif","Exfoliant chimique et décongestionnant/drainant"], correct:1, explanation:"L'extrait d'Hamamélis est à la fois anti-inflammatoire (apaise les irritations) et décongestionnant/drainant (favorise le retour veineux et lymphatique)." },
+  { category:"Principes actifs décongestionnants/drainants", question:"L'extrait de Lierre appartient à deux catégories de principes actifs. Lesquelles ?", options:["Anti-inflammatoire et humectant","Décongestionnant/drainant et lipolytique","Émollient et occlusif","Exfoliant chimique et décongestionnant/drainant"], correct:1, explanation:"L'extrait de Lierre appartient à deux catégories : décongestionnant/drainant (favorise le retour veineux et lymphatique) et lipolytique (stimule la dégradation des graisses)." },
+  // LIPOLYTIQUES
+  { category:"Principes actifs lipolytiques", question:"À quelle catégorie de principes actifs appartient la caféine ?", options:["Anti-inflammatoire et humectant","Occlusif et émollient","Lipolytique et décongestionnant/drainant","Exfoliant chimique acide et lipolytique"], correct:2, explanation:"La caféine appartient à deux catégories : lipolytique (stimule la dégradation des graisses) et décongestionnant/drainant (favorise le retour veineux et lymphatique)." },
+  { category:"Principes actifs lipolytiques", question:"À quelle catégorie de principes actifs appartient la L-carnitine ?", options:["Humectant","Lipolytique","Décongestionnant/drainant","Anti-inflammatoire"], correct:1, explanation:"La L-carnitine est un lipolytique : elle joue un rôle dans le transport des acides gras pour leur dégradation." },
+  { category:"Principes actifs lipolytiques", question:"À quelle catégorie de principes actifs appartient l'extrait de Guarana ?", options:["Anti-inflammatoire","Occlusif","Lipolytique","Humectant"], correct:2, explanation:"L'extrait de Guarana est un lipolytique (riche en caféine naturelle) utilisé dans les soins amincissants et anti-cellulite." },
+  { category:"Principes actifs lipolytiques", question:"À quelle catégorie de principes actifs appartient l'extrait de Fucus Vesiculosus ?", options:["Anti-inflammatoire","Humectant","Lipolytique","Occlusif"], correct:2, explanation:"L'extrait de Fucus Vesiculosus (algue marine) est un lipolytique utilisé dans les soins amincissants et anti-cellulite." },
+  { category:"Principes actifs lipolytiques", question:"L'extrait de thé vert appartient à deux catégories de principes actifs. Lesquelles ?", options:["Anti-inflammatoire et humectant","Lipolytique et décongestionnant/drainant","Occlusif et émollient","Exfoliant chimique acide et lipolytique"], correct:1, explanation:"L'extrait de thé vert appartient à deux catégories : lipolytique (stimule la dégradation des graisses) et décongestionnant/drainant (favorise le retour veineux et lymphatique)." },
+  // EXFOLIANTS MÉCANIQUES À PARTICULES
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartiennent les cristaux de sel marin ?", options:["Exfoliant chimique acide","Exfoliant mécanique à particules","Exfoliant mécanique à gommes","Exfoliant chimique enzymatique"], correct:1, explanation:"Les cristaux de sel marin sont des exfoliants mécaniques à particules : ils agissent par abrasion physique sur les cornéocytes." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartiennent les cristaux de sucre ?", options:["Exfoliant mécanique à gommes","Exfoliant mécanique à particules","Exfoliant chimique acide","Exfoliant chimique enzymatique"], correct:1, explanation:"Les cristaux de sucre sont des exfoliants mécaniques à particules d'origine naturelle : ils agissent par friction physique." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartient la poudre de noyaux d'abricots ?", options:["Exfoliant chimique enzymatique","Exfoliant chimique acide","Exfoliant mécanique à particules","Exfoliant mécanique à gommes"], correct:2, explanation:"La poudre de noyaux d'abricots est un exfoliant mécanique à particules d'origine naturelle." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartient la poudre de coques d'amandes ?", options:["Exfoliant chimique acide","Exfoliant chimique enzymatique","Exfoliant mécanique à particules","Exfoliant mécanique à gommes"], correct:2, explanation:"La poudre de coques d'amandes est un exfoliant mécanique à particules d'origine naturelle." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartient la poudre de coques de noix de coco ?", options:["Exfoliant mécanique à gommes","Exfoliant mécanique à particules","Exfoliant chimique acide","Exfoliant chimique enzymatique"], correct:1, explanation:"La poudre de coques de noix de coco est un exfoliant mécanique à particules d'origine naturelle." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartiennent les microbilles de silice ?", options:["Exfoliant mécanique à gommes","Exfoliant chimique acide","Exfoliant mécanique à particules","Exfoliant chimique enzymatique"], correct:2, explanation:"Les microbilles de silice sont des exfoliants mécaniques à particules d'origine synthétique." },
+  { category:"Exfoliants mécaniques à particules", question:"À quelle catégorie d'exfoliants appartiennent les microbilles de cellulose ?", options:["Exfoliant chimique enzymatique","Exfoliant chimique acide","Exfoliant mécanique à particules","Exfoliant mécanique à gommes"], correct:2, explanation:"Les microbilles de cellulose sont des exfoliants mécaniques à particules d'origine végétale." },
+  // EXFOLIANTS MÉCANIQUES À GOMMES
+  { category:"Exfoliants mécaniques à gommes", question:"À quelle catégorie d'exfoliants appartiennent les gommes synthétiques ?", options:["Exfoliant mécanique à particules","Exfoliant mécanique à gommes","Exfoliant chimique acide","Exfoliant chimique enzymatique"], correct:1, explanation:"Les gommes synthétiques sont des exfoliants mécaniques à gommes : elles adhèrent aux cornéocytes puis se détachent en les emportant." },
+  // EXFOLIANTS CHIMIQUES ACIDES
+  { category:"Exfoliants chimiques acides", question:"À quelle catégorie d'exfoliants appartient l'acide glycolique ?", options:["Exfoliant chimique enzymatique","Exfoliant chimique acide","Exfoliant mécanique à particules","Exfoliant mécanique à gommes"], correct:1, explanation:"L'acide glycolique est un exfoliant chimique acide (AHA) : il fragilise le ciment lipidique intercellulaire pour faciliter la desquamation." },
+  { category:"Exfoliants chimiques acides", question:"À quelle catégorie d'exfoliants appartient l'acide lactique ?", options:["Exfoliant chimique enzymatique","Exfoliant chimique acide","Occlusif","Humectant"], correct:1, explanation:"L'acide lactique est un exfoliant chimique acide (AHA) qui facilite la desquamation en fragilisant les liens entre cornéocytes." },
+  { category:"Exfoliants chimiques acides", question:"À quelle catégorie d'exfoliants appartient l'acide salicylique ?", options:["Exfoliant chimique enzymatique","Exfoliant mécanique à gommes","Exfoliant chimique acide","Anti-inflammatoire"], correct:2, explanation:"L'acide salicylique est un exfoliant chimique acide (BHA) : liposoluble, il peut pénétrer dans le pore en profondeur." },
+  // EXFOLIANTS CHIMIQUES ENZYMATIQUES
+  { category:"Exfoliants chimiques enzymatiques", question:"À quelle catégorie d'exfoliants appartient la bromélaïne ?", options:["Exfoliant mécanique à particules","Exfoliant chimique acide","Exfoliant chimique enzymatique","Exfoliant mécanique à gommes"], correct:2, explanation:"La bromélaïne (extraite de l'ananas) est un exfoliant chimique enzymatique : elle dégrade les protéines qui retiennent les cornéocytes, sans friction." },
+  { category:"Exfoliants chimiques enzymatiques", question:"À quelle catégorie d'exfoliants appartient la papaïne ?", options:["Exfoliant chimique acide","Exfoliant chimique enzymatique","Exfoliant mécanique à gommes","Lipolytique"], correct:1, explanation:"La papaïne (extraite de la papaye) est un exfoliant chimique enzymatique : elle dissout les protéines qui lient les cornéocytes entre eux." }
+];
+
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const QUESTIONS_PER_GAME = 20;
+const TIME_PER_Q = 20;
+const MAX_BASE_SCORE = 100;
+const MAX_SPEED_BONUS = 20;
+const SPEED_THRESHOLD = 5;
+
+let state = {
+  playerName: '', isTraining: false,
+  currentQuestions: [], currentIndex: 0,
+  score: 0, baseScore: 0, bonusScore: 0, correctCount: 0,
+  answered: false, timer: null, timeLeft: TIME_PER_Q, startTime: 0,
+  reviewData: []
+};
+
+// ══════════════════════════════════════════════
+// GOOGLE SHEETS — lecture & écriture
+// ══════════════════════════════════════════════
+async function fetchScores() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLLE_TON_URL_ICI') {
+    return null; // pas encore configuré
+  }
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+    const data = await resp.json();
+    return data.success ? data.scores : null;
+  } catch {
+    return null;
+  }
+}
+
+async function postScore(name, score, correct) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLLE_TON_URL_ICI') return null;
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        score,
+        correct,
+        date: new Date().toLocaleDateString('fr-BE')
+      })
+    });
+    const data = await resp.json();
+    return data.success ? data.scores : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderLeaderboard(containerId, rows, highlightName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  // URL non configurée
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLLE_TON_URL_ICI') {
+    el.innerHTML = '<div class="lb-error">⚠️ URL Apps Script non configurée — voir les instructions de mise en place.</div>';
+    return;
+  }
+
+  if (rows === null) {
+    el.innerHTML = '<div class="lb-error">⚠️ Impossible de charger le classement. Vérifie ta connexion ou l\'URL du script.</div>';
+    return;
+  }
+
+  if (!rows.length) {
+    el.innerHTML = '<div class="lb-empty">Aucun score encore — sois le premier ! 🏆</div>';
+    return;
+  }
+
+  el.innerHTML = rows.map((r, i) => {
+    const rankClass = ['r1','r2','r3'][i] || 'rn';
+    const medal = ['🥇','🥈','🥉'][i] || (i + 1);
+    const name = r[0], score = r[1], correct = r[2];
+    return `<div class="lb-row ${highlightName && name === highlightName ? 'highlight' : ''}">
+      <div class="lb-rank ${rankClass}">${medal}</div>
+      <div class="lb-name">${esc(name)}</div>
+      <div class="lb-correct">${correct}/${QUESTIONS_PER_GAME}</div>
+      <div class="lb-score">${score} pts</div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ══════════════════════════════════════════════
+// QUIZ LOGIC
+// ══════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function startQuiz() {
+  state.playerName = document.getElementById('player-name').value.trim();
+  state.isTraining = state.playerName.length === 0;
+  state.currentQuestions = shuffle(ALL_QUESTIONS).slice(0, QUESTIONS_PER_GAME);
+  state.currentIndex = 0; state.score = 0; state.baseScore = 0;
+  state.bonusScore = 0; state.correctCount = 0; state.reviewData = [];
+  showScreen('quiz-screen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.currentQuestions[state.currentIndex];
+  state.answered = false; state.timeLeft = TIME_PER_Q; state.startTime = Date.now();
+  document.getElementById('q-num').textContent = state.currentIndex + 1;
+  document.getElementById('score-live').textContent = state.score + ' pts';
+  document.getElementById('q-category').textContent = q.category;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('points-flash').classList.remove('show');
+  document.getElementById('next-btn').style.display = 'none';
+  const letters = ['A','B','C','D'];
+  const indices = shuffle([0,1,2,3]);
+  const correctShuffled = indices.indexOf(q.correct);
+  document.getElementById('options').innerHTML = indices.map((origIdx, si) =>
+    `<button class="option-btn" onclick="selectOption(${si},${correctShuffled})">
+      <span class="opt-letter">${letters[si]}</span>${esc(q.options[origIdx])}
+    </button>`
+  ).join('');
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timer);
+  updateTimer();
+  state.timer = setInterval(() => {
+    state.timeLeft -= 0.1;
+    if (state.timeLeft <= 0) { state.timeLeft = 0; clearInterval(state.timer); if (!state.answered) timeUp(); }
+    updateTimer();
+  }, 100);
+}
+
+function updateTimer() {
+  const pct = (state.timeLeft / TIME_PER_Q) * 100;
+  const warn = state.timeLeft <= 7;
+  document.getElementById('timer-bar').style.width = pct + '%';
+  document.getElementById('timer-bar').classList.toggle('warning', warn);
+  document.getElementById('timer-text').textContent = Math.ceil(state.timeLeft);
+  document.getElementById('timer-text').classList.toggle('warning', warn);
+}
+
+function timeUp() {
+  state.answered = true;
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  showExpl(false, true);
+  flashPoints('0 pt', false);
+  document.getElementById('next-btn').style.display = 'block';
+  state.reviewData.push({ q: state.currentQuestions[state.currentIndex], correct: false, timeout: true });
+}
+
+function selectOption(chosen, correctIdx) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timer);
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const ok = chosen === correctIdx;
+  const btns = document.querySelectorAll('.option-btn');
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  if (ok) {
+    btns[chosen].classList.add('correct');
+    const base = MAX_BASE_SCORE;
+    const bonus = elapsed <= SPEED_THRESHOLD ? Math.round(MAX_SPEED_BONUS * (1 - elapsed / SPEED_THRESHOLD)) : 0;
+    state.baseScore += base; state.bonusScore += bonus; state.score += base + bonus; state.correctCount++;
+    flashPoints(bonus > 0 ? `+${base} pts ⚡+${bonus} bonus` : `+${base} pts`, true);
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[correctIdx].classList.add('correct');
+    flashPoints('0 pt', false);
+  }
+  showExpl(ok, false);
+  document.getElementById('score-live').textContent = state.score + ' pts';
+  document.getElementById('next-btn').style.display = 'block';
+  state.reviewData.push({ q: state.currentQuestions[state.currentIndex], correct: ok, timeout: false });
+}
+
+function showExpl(ok, timeout) {
+  const q = state.currentQuestions[state.currentIndex];
+  const prefix = ok ? '✅ Bien joué !' : (timeout ? '⏰ Temps écoulé !' : '❌ Pas tout à fait…');
+  const el = document.getElementById('explanation');
+  el.innerHTML = `<strong>${prefix}</strong> ${esc(q.explanation)}`;
+  el.classList.add('show');
+}
+
+function flashPoints(label, positive) {
+  const el = document.getElementById('points-flash');
+  el.textContent = label;
+  el.className = 'points-flash show ' + (positive ? 'positive' : 'negative');
+}
+
+function nextQuestion() {
+  state.currentIndex++;
+  state.currentIndex >= QUESTIONS_PER_GAME ? showResults() : renderQuestion();
+}
+
+// ══════════════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════════════
+async function showResults() {
+  const pct = state.correctCount / QUESTIONS_PER_GAME;
+  document.getElementById('result-emoji').textContent = pct >= 0.8 ? '🎉' : pct >= 0.6 ? '👍' : pct >= 0.4 ? '💪' : '📚';
+  document.getElementById('result-title').innerHTML = state.isTraining
+    ? 'Partie terminée !'
+    : `Bravo <span class="player-name">${esc(state.playerName)}</span> !`;
+  document.getElementById('res-correct').textContent = `${state.correctCount}/${QUESTIONS_PER_GAME}`;
+  document.getElementById('res-base').textContent = state.baseScore;
+  document.getElementById('res-bonus').textContent = state.bonusScore;
+  document.getElementById('res-total').textContent = state.score;
+
+  if (state.isTraining) {
+    document.getElementById('training-result-msg').style.display = 'block';
+    document.getElementById('result-tabs-wrap').style.display = 'none';
+    document.getElementById('training-review-wrap').style.display = 'block';
+    buildReview('training-review-list');
+  } else {
+    document.getElementById('training-result-msg').style.display = 'none';
+    document.getElementById('result-tabs-wrap').style.display = 'block';
+    document.getElementById('training-review-wrap').style.display = 'none';
+    buildReview('review-list');
+
+    // Envoyer le score et afficher le classement mis à jour
+    document.getElementById('result-leaderboard').innerHTML = '<div class="lb-loading">⏳ Envoi du score en cours…</div>';
+    showScreen('result-screen');
+    const updatedScores = await postScore(state.playerName, state.score, state.correctCount);
+    renderLeaderboard('result-leaderboard', updatedScores, state.playerName);
+    return; // déjà affiché
+  }
+  showScreen('result-screen');
+}
+
+function buildReview(containerId) {
+  document.getElementById(containerId).innerHTML = state.reviewData.map((r, i) =>
+    `<div class="review-item">
+      <div class="rev-meta">${r.correct ? '✅' : r.timeout ? '⏰' : '❌'} Q${i+1} · ${esc(r.q.category)}</div>
+      <div class="rev-q">${esc(r.q.question)}</div>
+      <div class="rev-exp">${esc(r.q.explanation)}</div>
+    </div>`
+  ).join('');
+}
+
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-lb').style.display = tabId === 'tab-lb' ? 'block' : 'none';
+  document.getElementById('tab-review').style.display = tabId === 'tab-review' ? 'block' : 'none';
+}
+
+async function toggleLeaderboard() {
+  const el = document.getElementById('leaderboard-tab');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  if (el.style.display === 'block') {
+    document.getElementById('start-leaderboard').innerHTML = '<div class="lb-loading">⏳ Chargement…</div>';
+    const scores = await fetchScores();
+    renderLeaderboard('start-leaderboard', scores, null);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function resetToStart() {
+  clearInterval(state.timer);
+  document.getElementById('leaderboard-tab').style.display = 'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.getElementById('tab-lb').style.display = 'block';
+  document.getElementById('tab-review').style.display = 'none';
+  showScreen('start-screen');
+}
+
+// INIT
+document.getElementById('player-name').addEventListener('input', function() {
+  document.getElementById('training-badge').classList.toggle('show', this.value.trim().length === 0);
+});
+document.getElementById('player-name').addEventListener('keydown', e => { if(e.key==='Enter') startQuiz(); });
+</script>
+</body>
+</html>
