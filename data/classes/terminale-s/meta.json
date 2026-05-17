@@ -1,0 +1,7 @@
+{
+  "name": "Terminale S",
+  "description": "Classe de Terminale Scientifique",
+  "matieres": [
+    { "id": "physique", "path": "physique" }
+  ]
+}

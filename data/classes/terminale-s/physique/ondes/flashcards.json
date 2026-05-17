@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "recto": "Qu'est-ce qu'une onde mécanique ?",
+    "verso": "Une onde mécanique est une perturbation qui se propage dans un milieu matériel sans transport de matière, mais avec transport d'énergie. Elle nécessite un support pour se propager (ex. : onde sonore dans l'air)."
+  },
+  {
+    "id": 2,
+    "recto": "Qu'est-ce qu'une onde électromagnétique ?",
+    "verso": "Une onde électromagnétique est une perturbation des champs électrique et magnétique qui se propage dans le vide à la vitesse c ≈ 3 × 10⁸ m/s. Elle ne nécessite aucun support matériel (ex. : lumière, radio, rayons X)."
+  },
+  {
+    "id": 3,
+    "recto": "Quelle est la relation fondamentale des ondes ?",
+    "verso": "v = λ × f\n\noù v est la célérité (m/s), λ est la longueur d'onde (m) et f est la fréquence (Hz)."
+  },
+  {
+    "id": 4,
+    "recto": "Énoncer le principe de superposition des ondes.",
+    "verso": "Quand deux ondes se croisent en un même point, le déplacement résultant est la somme algébrique des déplacements de chaque onde. Les ondes se traversent sans se perturber mutuellement."
+  },
+  {
+    "id": 5,
+    "recto": "Qu'est-ce que l'effet Doppler ?",
+    "verso": "L'effet Doppler est la modification de la fréquence perçue d'une onde lorsque la source ou l'observateur est en mouvement. Si la source se rapproche, la fréquence perçue est plus élevée ; si elle s'éloigne, elle est plus basse."
+  }
+]

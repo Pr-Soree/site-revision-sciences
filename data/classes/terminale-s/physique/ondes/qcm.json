@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "question": "Quelle est la vitesse de la lumière dans le vide ?",
+    "options": [
+      "3 × 10⁸ m/s",
+      "3 × 10⁶ m/s",
+      "3 × 10¹⁰ m/s",
+      "1,5 × 10⁸ m/s"
+    ],
+    "reponse": 0,
+    "explication": "La vitesse de la lumière dans le vide est c ≈ 3 × 10⁸ m/s. C'est une constante fondamentale de la physique."
+  },
+  {
+    "id": 2,
+    "question": "Quelle relation lie la vitesse v, la longueur d'onde λ et la fréquence f d'une onde ?",
+    "options": [
+      "v = λ / f",
+      "v = f / λ",
+      "v = λ × f",
+      "v = λ + f"
+    ],
+    "reponse": 2,
+    "explication": "La relation fondamentale des ondes est v = λ × f. La vitesse est le produit de la longueur d'onde par la fréquence."
+  },
+  {
+    "id": 3,
+    "question": "Qu'est-ce que le phénomène de diffraction ?",
+    "options": [
+      "Le changement de vitesse d'une onde à l'interface de deux milieux",
+      "L'étalement d'une onde lorsqu'elle rencontre un obstacle ou une ouverture",
+      "La superposition de deux ondes de même fréquence",
+      "L'absorption d'une onde par un milieu opaque"
+    ],
+    "reponse": 1,
+    "explication": "La diffraction est l'étalement d'une onde autour d'un obstacle ou à travers une ouverture. Elle est d'autant plus marquée que la taille de l'ouverture est proche de la longueur d'onde."
+  }
+]

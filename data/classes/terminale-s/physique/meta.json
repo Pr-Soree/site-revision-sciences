@@ -1,0 +1,7 @@
+{
+  "name": "Physique-Chimie",
+  "description": "Lois fondamentales de la physique et de la chimie",
+  "chapitres": [
+    { "id": "ondes", "path": "ondes" }
+  ]
+}
