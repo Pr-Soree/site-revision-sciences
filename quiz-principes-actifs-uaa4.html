@@ -242,6 +242,16 @@
   .review-item .rev-q { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
   .review-item .rev-exp { font-size: 13px; color: var(--accent2); border-left: 2px solid var(--accent2); padding-left: 10px; }
 
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-muted); background: none; border: none;
+    cursor: pointer; padding: 6px 0; margin-bottom: 16px;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--accent); }
+
   @media(max-width: 520px) {
     .card { padding: 20px 16px; }
     #start-screen .rules { grid-template-columns: 1fr; }
@@ -251,6 +261,7 @@
 </head>
 <body>
 
+<button class="back-btn" onclick="window.location.href='index.html'">← Retour au site</button>
 <div class="header">
   <div class="badge">Sciences Appliquées · 5EQ Esthétique</div>
   <h1>Principes Actifs<br><span>UAA 4 — Modelage Corps</span></h1>
