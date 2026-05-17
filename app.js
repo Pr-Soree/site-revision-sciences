@@ -45,13 +45,13 @@ async function showClasses() {
   const index = await loadJSON('index.json');
 
   const metas = await Promise.all(
-    index.classes.map(c => loadJSON(`${c.path}/meta.json`).then(m => ({ ...c, ...m })))
+    index.classes.map(id => loadJSON(`classes/${id}/meta.json`).then(m => ({ id, path: `classes/${id}`, ...m })))
   );
 
   app.innerHTML = `<h2 class="section-title">Choisissez votre classe</h2>
     <div class="grid">${metas.map(c =>
       `<button class="card" data-id="${c.id}" data-path="${c.path}">
-         <h2>${c.name}</h2>
+         <h2>${c.label}</h2>
          ${c.description ? `<p>${c.description}</p>` : ''}
        </button>`
     ).join('')}</div>`;
@@ -59,7 +59,7 @@ async function showClasses() {
   app.querySelectorAll('.card').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = metas.find(c => c.id === btn.dataset.id);
-      pushCrumb(item.name, () => showMatieres(item));
+      pushCrumb(item.label, () => showMatieres(item));
       showMatieres(item);
     });
   });
@@ -68,15 +68,15 @@ async function showClasses() {
 async function showMatieres(classe) {
   app.innerHTML = '<p class="loading">Chargement…</p>';
   const metas = await Promise.all(
-    classe.matieres.map(m =>
-      loadJSON(`${classe.path}/${m.path}/meta.json`).then(d => ({ ...m, ...d, classePath: classe.path }))
+    classe.matieres.map(id =>
+      loadJSON(`${classe.path}/${id}/meta.json`).then(d => ({ id, path: id, classePath: classe.path, ...d }))
     )
   );
 
-  app.innerHTML = `<h2 class="section-title">Matières — ${classe.name}</h2>
+  app.innerHTML = `<h2 class="section-title">Matières — ${classe.label}</h2>
     <div class="grid">${metas.map(m =>
       `<button class="card" data-id="${m.id}">
-         <h2>${m.name}</h2>
+         <h2>${m.label}</h2>
          ${m.description ? `<p>${m.description}</p>` : ''}
        </button>`
     ).join('')}</div>`;
@@ -84,7 +84,7 @@ async function showMatieres(classe) {
   app.querySelectorAll('.card').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = metas.find(m => m.id === btn.dataset.id);
-      pushCrumb(item.name, () => showChapitres(item));
+      pushCrumb(item.label, () => showChapitres(item));
       showChapitres(item);
     });
   });
@@ -94,15 +94,15 @@ async function showChapitres(matiere) {
   app.innerHTML = '<p class="loading">Chargement…</p>';
   const basePath = `${matiere.classePath}/${matiere.path}`;
   const metas = await Promise.all(
-    matiere.chapitres.map(ch =>
-      loadJSON(`${basePath}/${ch.path}/meta.json`).then(d => ({ ...ch, ...d, basePath }))
+    matiere.chapitres.map(id =>
+      loadJSON(`${basePath}/${id}/meta.json`).then(d => ({ id, path: id, basePath, ...d }))
     )
   );
 
-  app.innerHTML = `<h2 class="section-title">Chapitres — ${matiere.name}</h2>
+  app.innerHTML = `<h2 class="section-title">Chapitres — ${matiere.label}</h2>
     <div class="grid">${metas.map(ch =>
       `<button class="card" data-id="${ch.id}">
-         <h2>${ch.name}</h2>
+         <h2>${ch.label}</h2>
          ${ch.description ? `<p>${ch.description}</p>` : ''}
        </button>`
     ).join('')}</div>`;
@@ -110,7 +110,7 @@ async function showChapitres(matiere) {
   app.querySelectorAll('.card').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = metas.find(ch => ch.id === btn.dataset.id);
-      pushCrumb(item.name, () => showModes(item));
+      pushCrumb(item.label, () => showModes(item));
       showModes(item);
     });
   });
@@ -119,7 +119,7 @@ async function showChapitres(matiere) {
 function showModes(chapitre) {
   const chPath = `${chapitre.basePath}/${chapitre.path}`;
   app.innerHTML = `
-    <h2 class="section-title">${chapitre.name}</h2>
+    <h2 class="section-title">${chapitre.label}</h2>
     ${chapitre.description ? `<p style="color:var(--muted);margin-bottom:1.5rem">${chapitre.description}</p>` : ''}
     <div class="mode-grid">
       <button class="mode-btn" id="btn-qcm">
