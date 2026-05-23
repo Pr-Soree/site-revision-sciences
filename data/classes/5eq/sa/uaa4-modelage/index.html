@@ -1,0 +1,2446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révision UAA4 — Modelage corps</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --warm-white: #FFFDF9;
+  --blush: #F2C4B8;
+  --rose: #E8897A;
+  --rose-deep: #C96B5A;
+  --sage: #8FAF8A;
+  --sage-light: #C8DEC5;
+  --sage-deep: #5A8555;
+  --sand: #D4C4A8;
+  --sand-light: #EDE5D4;
+  --charcoal: #2C2C2C;
+  --mid: #6B6560;
+  --light: #A09890;
+  --gold: #C9A96E;
+  --success: #6BAF7A;
+  --danger: #E8897A;
+  --shadow: 0 4px 24px rgba(44,44,44,0.08);
+  --shadow-lg: 0 8px 40px rgba(44,44,44,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ── BACKGROUND DECORATION ── */
+.bg-blob {
+  position: fixed; pointer-events: none; z-index: 0;
+  border-radius: 50%; filter: blur(60px); opacity: 0.35;
+}
+.blob1 { width: 320px; height: 320px; background: var(--blush); top: -80px; right: -80px; }
+.blob2 { width: 260px; height: 260px; background: var(--sage-light); bottom: 60px; left: -60px; }
+.blob3 { width: 200px; height: 200px; background: var(--sand); top: 40%; right: -40px; }
+
+/* ── CONTAINER ── */
+.container { position: relative; z-index: 1; width: 100%; max-width: 520px; margin: 0 auto; padding: 0 24px; }
+
+/* ── LOGIN SCREEN ── */
+#screen-login {
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+.login-box {
+  background: var(--warm-white);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 400px;
+  margin: 0 20px;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.login-logo .logo-icon {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--blush), var(--rose));
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(232,137,122,0.3);
+}
+.login-logo h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--charcoal);
+  line-height: 1.2;
+}
+.login-logo p {
+  font-size: 13px;
+  color: var(--mid);
+  margin-top: 4px;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mid);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--sand-light);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--charcoal);
+  background: var(--cream);
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--rose);
+}
+.alert-box {
+  background: var(--sand-light);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+.alert-box strong { color: var(--rose-deep); }
+.btn {
+  display: block; width: 100%;
+  padding: 15px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: white;
+  box-shadow: 0 4px 16px rgba(232,137,122,0.35);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,137,122,0.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  background: var(--sand-light);
+  color: var(--charcoal);
+  margin-top: 10px;
+}
+.btn-sage {
+  background: linear-gradient(135deg, var(--sage), var(--sage-deep));
+  color: white;
+  box-shadow: 0 4px 16px rgba(90,133,85,0.25);
+}
+
+/* ── DATE SETUP SCREEN ── */
+#screen-date { justify-content: center; align-items: center; padding: 40px 0; }
+.date-box {
+  background: var(--warm-white);
+  border-radius: 24px;
+  padding: 36px 28px;
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 400px; margin: 0 20px;
+}
+.date-box h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; margin-bottom: 8px;
+}
+.date-box p { font-size: 14px; color: var(--mid); line-height: 1.6; margin-bottom: 24px; }
+
+/* ── DASHBOARD ── */
+#screen-dashboard { padding-bottom: 100px; }
+.dash-header {
+  padding: 48px 24px 24px;
+  position: relative; z-index: 1;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.dash-header .greeting {
+  font-size: 13px; color: var(--mid); font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.dash-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; color: var(--charcoal);
+  line-height: 1.2;
+}
+.countdown-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--rose); color: white;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  margin-top: 12px;
+  box-shadow: 0 2px 12px rgba(232,137,122,0.3);
+}
+.countdown-badge.no-date {
+  background: var(--sand); color: var(--mid);
+  box-shadow: none;
+}
+.section-title {
+  font-size: 11px; font-weight: 600; color: var(--mid);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  padding: 0 24px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.today-card {
+  margin: 0 auto 24px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  border-radius: 20px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 6px 24px rgba(201,107,90,0.35);
+  position: relative; overflow: hidden;
+}
+.today-card::before {
+  content: '';
+  position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.today-card .day-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+.today-card h3 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 12px; }
+.today-card .packs-list { font-size: 13px; opacity: 0.9; margin-bottom: 16px; line-height: 1.8; }
+.progress-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 8px; height: 6px; margin-bottom: 8px; }
+.progress-bar-fill { height: 100%; border-radius: 8px; background: white; transition: width .4s ease; }
+.today-card .progress-label { font-size: 12px; opacity: 0.8; }
+.today-card .no-date-msg { font-size: 14px; opacity: 0.9; line-height: 1.6; }
+
+.btn-today {
+  display: block; width: 100%;
+  padding: 15px; border: none; border-radius: var(--radius-sm);
+  background: white; color: var(--rose-deep);
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 16px;
+  transition: all .2s;
+}
+.btn-today:hover { background: var(--cream); }
+
+.stats-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 auto 24px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+}
+.stat-card {
+  background: var(--warm-white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.stat-card .stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; color: var(--charcoal);
+}
+.stat-card .stat-lbl { font-size: 12px; color: var(--mid); margin-top: 2px; }
+
+.free-card {
+  margin: 0 auto 24px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+  background: var(--warm-white);
+  border-radius: 20px; padding: 20px;
+  box-shadow: var(--shadow);
+}
+.free-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; margin-bottom: 6px;
+}
+.free-card p { font-size: 13px; color: var(--mid); margin-bottom: 16px; line-height: 1.5; }
+.pack-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pack-chip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--sand-light);
+  background: var(--cream);
+  font-size: 13px; font-weight: 500; color: var(--mid);
+  cursor: pointer; transition: all .15s;
+  min-height: 38px;
+  display: flex; align-items: center;
+}
+.pack-chip.selected {
+  border-color: var(--sage); background: var(--sage-light);
+  color: var(--sage-deep);
+}
+
+.planning-card {
+  margin: 0 auto 24px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+  background: var(--warm-white);
+  border-radius: 20px; padding: 20px;
+  box-shadow: var(--shadow);
+}
+.planning-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; margin-bottom: 12px;
+}
+.planning-day {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sand-light);
+}
+.planning-day:last-child { border-bottom: none; }
+.planning-day .day-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+  margin-top: 2px;
+}
+.planning-day.past .day-dot { background: var(--sage-light); color: var(--sage-deep); }
+.planning-day.today .day-dot { background: var(--rose); color: white; }
+.planning-day.future .day-dot { background: var(--sand-light); color: var(--mid); }
+.planning-day.rest .day-dot { background: var(--sand-light); color: var(--light); }
+.planning-day .day-info .day-date { font-size: 12px; color: var(--mid); }
+.planning-day .day-info .day-content { font-size: 13px; color: var(--charcoal); font-weight: 500; margin-top: 2px; }
+.planning-day.rest .day-info .day-content { color: var(--light); font-style: italic; }
+
+.plan-stats {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;
+}
+.ps-item {
+  font-size: 11px; padding: 2px 8px;
+  border-radius: var(--border-radius-md);
+  background: var(--sand-light); color: var(--mid);
+}
+.ps-done { background: var(--sage-light); color: var(--sage-deep); }
+.ps-left { background: #F5E6E6; }
+.ps-total { background: var(--sand-light); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--warm-white);
+  border-top: 1px solid var(--sand-light);
+  display: flex; z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 12px 8px;
+  border: none; background: none; cursor: pointer;
+  color: var(--light); font-family: 'DM Sans', sans-serif;
+  font-size: 10px; font-weight: 500; gap: 4px;
+  transition: color .15s;
+}
+.nav-btn.active { color: var(--rose); }
+.nav-icon { font-size: 22px; }
+
+/* ── STUDY SCREEN ── */
+#screen-study {
+  padding-bottom: 40px;
+}
+#screen-study.active {
+  display: flex;
+  flex-direction: column;
+}
+.study-header {
+  padding: 36px 20px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.back-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--sand-light);
+  background: var(--warm-white);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; color: var(--mid);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.study-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; flex: 1;
+}
+.study-progress {
+  padding: 0 20px 20px;
+}
+.study-progress .progress-track {
+  background: var(--sand-light); border-radius: 8px; height: 6px;
+  margin-bottom: 8px;
+}
+.study-progress .progress-fill {
+  height: 100%; border-radius: 8px;
+  background: linear-gradient(90deg, var(--rose), var(--rose-deep));
+  transition: width .3s ease;
+}
+.study-progress .progress-txt {
+  font-size: 12px; color: var(--mid);
+  display: flex; justify-content: space-between;
+}
+
+/* ── CHAPTER BADGE ── */
+.chapter-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px; border-radius: 24px;
+  background: var(--sand-light);
+  border: 1px solid var(--sand);
+  font-size: 15px; font-weight: 600; color: var(--charcoal);
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgba(44,44,44,0.07);
+}
+.chapter-badge.priority {
+  background: #FDF0E0;
+  border-color: #E8A830;
+  color: #7A4F00;
+  box-shadow: 0 2px 10px rgba(201,144,58,0.18);
+}
+
+/* ── CENTERED CARD SCENE ── */
+.card-scene-centered {
+  width: 100%;
+  max-width: 440px;
+  perspective: 1000px;
+  height: 300px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.answer-btns-centered {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+}
+.card-scene {
+  margin: 0 20px 24px;
+  perspective: 1000px;
+  height: 280px;
+}
+.card-3d {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.card-3d.flipped { transform: rotateY(180deg); }
+.card-face {
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 20px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+}
+.card-front {
+  background: linear-gradient(145deg, var(--warm-white), var(--cream));
+  border: 1.5px solid var(--sand-light);
+}
+.card-back {
+  background: linear-gradient(145deg, var(--sage-light), #D8EDD5);
+  border: 1.5px solid var(--sage);
+  transform: rotateY(180deg);
+}
+.card-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 16px;
+  color: var(--light);
+}
+.card-back .card-label { color: var(--sage-deep); }
+.card-text {
+  font-size: 16px; line-height: 1.6;
+  text-align: center; color: var(--charcoal);
+  font-weight: 500;
+}
+.card-back .card-text {
+  font-size: 14px; font-weight: 400; text-align: left;
+  white-space: pre-line;
+}
+.card-hint {
+  position: absolute; bottom: 16px;
+  font-size: 11px; color: var(--light);
+}
+.leitner-badge {
+  position: absolute; top: 14px; right: 14px;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.lv1 { background: #F5E6E6; color: #C96B5A; }
+.lv2 { background: #FDF0E0; color: #C9903A; }
+.lv3 { background: #E8F0E8; color: #5A8555; }
+.lv4 { background: #E0EAF5; color: #4A75A8; }
+.lv5 { background: #EDE0F5; color: #7A5AA8; }
+
+.answer-btns {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 0 20px;
+}
+.btn-knew {
+  padding: 16px; border: none; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--sage), var(--sage-deep));
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(90,133,85,0.25);
+  transition: all .2s;
+}
+.btn-knew:hover { transform: translateY(-1px); }
+.btn-didnt {
+  padding: 16px; border: none; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(232,137,122,0.3);
+  transition: all .2s;
+}
+.btn-didnt:hover { transform: translateY(-1px); }
+.answer-hint { text-align: center; font-size: 12px; color: var(--light); margin-top: 12px; padding: 0 20px; }
+
+/* ── SESSION END ── */
+.session-end {
+  padding: 48px 20px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.end-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--sage-light), var(--sage));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(90,133,85,0.25);
+}
+.session-end h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; margin-bottom: 8px;
+}
+.session-end p { font-size: 15px; color: var(--mid); line-height: 1.6; margin-bottom: 24px; }
+.result-chips { display: flex; gap: 12px; margin-bottom: 32px; justify-content: center; }
+.result-chip {
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 600;
+}
+.chip-green { background: var(--sage-light); color: var(--sage-deep); }
+.chip-red { background: #F5E6E6; color: var(--rose-deep); }
+.tomorrow-box {
+  width: 100%; background: var(--sand-light);
+  border-radius: var(--radius); padding: 16px 20px;
+  text-align: left; margin-bottom: 24px;
+}
+.tomorrow-box .tmw-label { font-size: 11px; font-weight: 600; color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.tomorrow-box .tmw-content { font-size: 14px; color: var(--charcoal); line-height: 1.6; }
+
+/* ── PROFILE SCREEN ── */
+#screen-profile { padding-bottom: 100px; }
+.profile-header { padding: 48px 24px 24px; max-width: 520px; margin: 0 auto; }
+.profile-header h2 { font-family: 'DM Serif Display', serif; font-size: 26px; }
+.profile-section { margin: 0 auto 20px; width: calc(100% - 48px); max-width: 520px; }
+.profile-card {
+  background: var(--warm-white); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.profile-card h4 { font-size: 13px; font-weight: 600; color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sand-light); }
+.profile-row:last-child { border-bottom: none; }
+.profile-row .pr-label { font-size: 13px; color: var(--mid); }
+.profile-row .pr-value { font-size: 14px; font-weight: 500; color: var(--charcoal); }
+.leitner-bars { display: flex; flex-direction: column; gap: 8px; }
+.leitner-row { display: flex; align-items: center; gap: 10px; }
+.leitner-row .lv-label { font-size: 12px; width: 50px; color: var(--mid); }
+.leitner-row .lv-bar-wrap { flex: 1; background: var(--sand-light); border-radius: 6px; height: 8px; }
+.leitner-row .lv-bar { height: 100%; border-radius: 6px; transition: width .4s; }
+.leitner-row .lv-count { font-size: 12px; font-weight: 600; width: 24px; text-align: right; }
+.lv1-bar { background: #C96B5A; }
+.lv2-bar { background: #C9903A; }
+.lv3-bar { background: var(--sage); }
+.lv4-bar { background: #4A75A8; }
+.lv5-bar { background: #7A5AA8; }
+.btn-danger { background: #F5E6E6; color: var(--rose-deep); border: none; }
+.btn-sm-block { display: block; width: 100%; padding: 12px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; margin-top: 10px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--charcoal); color: white;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 500;
+  opacity: 0; transition: all .3s; pointer-events: none;
+  white-space: nowrap; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeInUp .35s ease both; }
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop .2s ease; }
+
+/* ── ADMIN LINK ── */
+.admin-link {
+  text-align: center; margin-top: 20px;
+  font-size: 11px; color: var(--light);
+}
+.admin-link button {
+  background: none; border: none; color: var(--light);
+  font-size: 11px; cursor: pointer; text-decoration: underline;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── ADMIN SCREENS ── */
+#screen-admin-login { justify-content: center; align-items: center; padding: 40px 0; }
+.admin-box {
+  background: var(--warm-white);
+  border-radius: 24px; padding: 36px 28px;
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 400px; margin: 0 20px;
+}
+.admin-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--charcoal); color: white;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+.admin-box h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; }
+.admin-box p { font-size: 13px; color: var(--mid); margin-bottom: 24px; line-height: 1.5; }
+
+#screen-admin { padding-bottom: 100px; }
+.admin-header {
+  padding: 48px 20px 20px;
+  display: flex; align-items: center; gap: 12px;
+  position: relative; z-index: 1;
+}
+.admin-header h2 { font-family: 'DM Serif Display', serif; font-size: 22px; flex: 1; }
+.admin-tabs {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding: 0 20px 16px; position: relative; z-index: 1;
+  scrollbar-width: none;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+.admin-tab {
+  white-space: nowrap; padding: 7px 14px;
+  border-radius: 20px; border: 1.5px solid var(--sand-light);
+  background: var(--warm-white); color: var(--mid);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  flex-shrink: 0; transition: all .15s;
+}
+.admin-tab.active {
+  background: var(--charcoal); color: white; border-color: var(--charcoal);
+}
+.admin-card-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.admin-card {
+  background: var(--warm-white); border-radius: var(--radius);
+  border: 1.5px solid var(--sand-light);
+  overflow: hidden; box-shadow: var(--shadow);
+}
+.admin-card.open { border-color: var(--charcoal); }
+.admin-card-header {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; cursor: pointer;
+}
+.admin-card-num {
+  font-size: 11px; font-weight: 600; color: var(--light);
+  min-width: 24px; padding-top: 2px;
+}
+.admin-card-preview {
+  flex: 1; font-size: 13px; color: var(--charcoal); line-height: 1.5;
+}
+.admin-chevron { font-size: 16px; color: var(--light); transition: transform .2s; }
+.admin-card.open .admin-chevron { transform: rotate(180deg); }
+.admin-card-body {
+  padding: 0 14px 14px; display: none; flex-direction: column; gap: 10px;
+}
+.admin-card.open .admin-card-body { display: flex; }
+.admin-field-label {
+  font-size: 10px; font-weight: 600; color: var(--mid);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+}
+.admin-textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--sand-light); border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--charcoal); background: var(--cream);
+  resize: vertical; line-height: 1.5;
+}
+.admin-textarea:focus { outline: none; border-color: var(--charcoal); }
+.admin-card-actions {
+  display: flex; justify-content: space-between; align-items: center; margin-top: 4px;
+}
+.btn-del {
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--rose); background: none;
+  color: var(--rose-deep); font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.btn-del.confirm { background: #F5E6E6; }
+.admin-save-bar {
+  position: fixed; bottom: 70px; left: 0; right: 0;
+  background: var(--charcoal); color: white;
+  padding: 12px 24px; display: flex; align-items: center;
+  justify-content: space-between; z-index: 200;
+  transform: translateY(100px); transition: transform .3s;
+}
+.admin-save-bar.visible { transform: translateY(0); }
+.admin-save-bar span { font-size: 13px; }
+.btn-save-admin {
+  padding: 8px 20px; border-radius: var(--radius-sm);
+  border: none; background: var(--rose); color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.add-card-admin {
+  margin: 14px 20px 0;
+  padding: 12px; border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--sand); background: none;
+  color: var(--mid); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; cursor: pointer; width: calc(100% - 40px);
+}
+.add-card-admin:hover { background: var(--sand-light); }
+
+/* ── RULES SCREEN ── */
+#screen-rules { padding-bottom: 100px; }
+.rules-header { padding: 48px 24px 24px; max-width: 520px; margin: 0 auto; }
+.rules-header h2 { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 6px; }
+.rules-header p { font-size: 14px; color: var(--mid); line-height: 1.6; }
+.rules-section { margin: 0 auto 20px; width: calc(100% - 48px); max-width: 520px; }
+.rules-card {
+  background: var(--warm-white); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.rules-card h4 {
+  font-size: 13px; font-weight: 600; color: var(--mid);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;
+}
+.rule-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--sand-light);
+}
+.rule-item:last-child { border-bottom: none; padding-bottom: 0; }
+.rule-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.rule-body .rule-title { font-size: 14px; font-weight: 500; color: var(--charcoal); margin-bottom: 3px; }
+.rule-body .rule-desc { font-size: 13px; color: var(--mid); line-height: 1.5; }
+.leitner-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.leitner-table th {
+  text-align: left; font-size: 11px; font-weight: 600;
+  color: var(--mid); text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 6px 8px; border-bottom: 1px solid var(--sand-light);
+}
+.leitner-table td { padding: 8px; border-bottom: 1px solid var(--sand-light); color: var(--charcoal); }
+.leitner-table tr:last-child td { border-bottom: none; }
+.lv-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+}
+
+/* ── REMINDER BANNER ── */
+.reminder-banner {
+  margin: 0 auto 20px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+  background: linear-gradient(135deg, #FDF0E0, #FAE5C0);
+  border: 1px solid #F0C060;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.reminder-banner .rem-icon {
+  font-size: 24px; flex-shrink: 0; margin-top: 2px;
+}
+.reminder-banner .rem-body .rem-title {
+  font-size: 14px; font-weight: 500; color: #7A4F00; margin-bottom: 4px;
+}
+.reminder-banner .rem-body .rem-msg {
+  font-size: 13px; color: #9A6800; line-height: 1.5;
+}
+.reminder-banner .rem-body .rem-btn {
+  margin-top: 10px; display: inline-block;
+  padding: 7px 16px; border-radius: var(--radius-sm);
+  background: #C9903A; color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer;
+}
+/* ══════════════════════════════════════════
+   MOBILE OPTIMIZATIONS
+   ══════════════════════════════════════════ */
+
+/* Réduire les marges latérales sur petit écran */
+@media (max-width: 420px) {
+  .container { padding: 0 16px; }
+  .today-card,
+  .stats-row,
+  .free-card,
+  .planning-card,
+  .reminder-banner { width: calc(100% - 32px); }
+  .profile-section { width: calc(100% - 32px); }
+  .rules-section { width: calc(100% - 32px); }
+  .section-title { padding: 0 16px; }
+  .dash-header { padding: 36px 16px 20px; }
+  .profile-header { padding: 36px 16px 20px; }
+  .rules-header { padding: 36px 16px 20px; }
+}
+
+/* Carte flashcard : hauteur adaptative selon la hauteur d'écran */
+@media (max-height: 700px) {
+  .card-scene-centered { height: 220px; }
+  .card-face { padding: 18px; }
+  .card-text { font-size: 14px; }
+  .card-back .card-text { font-size: 13px; }
+  .study-header { padding: 24px 20px 12px; }
+  .study-progress { padding: 0 20px 12px; }
+  .chapter-badge { font-size: 13px; padding: 6px 14px; }
+}
+
+@media (max-height: 600px) {
+  .card-scene-centered { height: 180px; }
+  .card-face { padding: 14px; }
+  .card-text { font-size: 13px; line-height: 1.4; }
+  .card-back .card-text { font-size: 12px; }
+  .card-label { margin-bottom: 8px; }
+}
+
+/* Badge chapitre : taille réduite sur petit écran */
+@media (max-width: 380px) {
+  .chapter-badge { font-size: 13px; padding: 6px 14px; }
+  .card-text { font-size: 14px; }
+}
+
+/* Boutons de réponse : plus grands sur mobile pour faciliter le tap */
+@media (max-width: 480px) {
+  .btn-knew, .btn-didnt {
+    padding: 18px 12px;
+    font-size: 14px;
+    min-height: 56px;
+  }
+  .answer-btns-centered { gap: 10px; }
+}
+
+/* Nav : texte plus petit sur très petit écran */
+@media (max-width: 360px) {
+  .nav-btn { font-size: 9px; padding: 10px 4px; }
+  .nav-icon { font-size: 20px; }
+}
+
+/* Écran de connexion : padding réduit */
+@media (max-width: 420px) {
+  .login-box { padding: 28px 20px; margin: 0 16px; }
+  .login-logo h1 { font-size: 19px; }
+}
+
+/* Today card : texte adapté */
+@media (max-width: 380px) {
+  .today-card h3 { font-size: 19px; }
+  .today-card .packs-list { font-size: 12px; }
+  .btn-today { font-size: 14px; padding: 13px; }
+}
+
+/* Pack chips : wrap naturel */
+@media (max-width: 380px) {
+  .pack-chip { font-size: 12px; padding: 6px 10px; }
+}
+
+/* Résultats de session */
+@media (max-width: 420px) {
+  .session-end { padding: 32px 16px; }
+  .result-chips { gap: 8px; }
+  .result-chip { padding: 8px 14px; font-size: 13px; }
+}
+
+/* Texte header dashboard */
+@media (max-width: 380px) {
+  .dash-header h2 { font-size: 24px; }
+  .stat-num { font-size: 24px !important; }
+}
+
+/* Admin tabs scroll visible */
+@media (max-width: 480px) {
+  .admin-tabs { gap: 6px; padding: 0 16px 14px; }
+  .admin-tab { font-size: 11px; padding: 6px 10px; }
+}
+
+/* Planning day : compact sur mobile */
+@media (max-width: 380px) {
+  .planning-day .day-info .day-content { font-size: 12px; }
+  .planning-day .day-date { font-size: 11px; }
+  .day-dot { width: 24px !important; height: 24px !important; font-size: 10px !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+<div class="bg-blob blob3"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — LOGIN
+══════════════════════════════════════════ -->
+<div class="screen active" id="screen-login">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;">
+  <div class="login-box fade-in">
+    <div class="login-logo">
+      <div class="logo-icon">🌿</div>
+      <h1>Révision UAA4<br>Modelage corps</h1>
+      <p>Sciences Appliquées — 5e Esthétique</p>
+    </div>
+    <div class="alert-box">
+      <strong>⚠️ Important !</strong> Note bien le prénom que tu entres ici. Tu devras utiliser <strong>exactement le même</strong> à chaque fois pour retrouver ta progression.
+    </div>
+    <div class="form-group">
+      <label>Ton prénom</label>
+      <input type="text" id="input-name" placeholder="Ex : Marie" autocomplete="given-name" />
+    </div>
+    <button class="btn btn-primary" onclick="handleLogin()">Commencer →</button>
+    <div class="admin-link"><button onclick="showAdminLogin()">Accès enseignant</button></div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN — ADMIN LOGIN
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-admin-login">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;">
+  <div class="admin-box fade-in">
+    <div class="admin-badge">🔒 Espace enseignant</div>
+    <h2>Accès administrateur</h2>
+    <p>Entre le code enseignant pour accéder à l'éditeur de flashcards.</p>
+    <div class="form-group">
+      <label>Code enseignant</label>
+      <input type="password" id="input-admin-code" placeholder="••••••••" />
+    </div>
+    <button class="btn btn-primary" onclick="handleAdminLogin()">Accéder →</button>
+    <button class="btn btn-secondary" onclick="showScreen('login')" style="margin-top:10px;">← Retour</button>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN — ADMIN EDITOR
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-admin">
+  <div class="admin-header container">
+    <button class="back-btn" onclick="exitAdmin()">←</button>
+    <h2>Éditeur de flashcards</h2>
+    <div class="admin-badge">Admin</div>
+  </div>
+  <div class="admin-tabs" id="admin-tabs"></div>
+  <div class="admin-card-list" id="admin-card-list"></div>
+  <button class="add-card-admin" onclick="adminAddCard()">＋ Ajouter une carte</button>
+  <div style="height:140px"></div>
+
+  <div class="admin-save-bar" id="admin-save-bar">
+    <span id="admin-save-msg">Modifications non sauvegardées</span>
+    <button class="btn-save-admin" onclick="adminSave()">💾 Sauvegarder</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active"><span class="nav-icon">✏️</span>Éditeur</button>
+    <button class="nav-btn" onclick="exitAdmin()"><span class="nav-icon">🚪</span>Quitter</button>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — DATE SETUP
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-date">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;">
+  <div class="date-box fade-in">
+    <h2>Bonjour <span id="date-name"></span> 👋</h2>
+    <p>Pour créer ton planning personnalisé, j'ai besoin de savoir <strong>quand tu as ton évaluation</strong>.<br>Si tu ne la connais pas encore, pas de problème — tu pourras la rentrer plus tard.</p>
+    <div class="form-group">
+      <label>Date de ton évaluation</label>
+      <input type="date" id="input-date" />
+    </div>
+    <button class="btn btn-primary" onclick="handleDateSet()">Créer mon planning →</button>
+    <button class="btn btn-secondary" onclick="handleDateSkip()">Je ne connais pas encore la date</button>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3 — DASHBOARD
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-dashboard">
+  <div class="dash-header container">
+    <div class="greeting" id="dash-greeting">Bonjour</div>
+    <h2 id="dash-name">—</h2>
+    <div class="countdown-badge" id="countdown-badge">
+      <span>📅</span><span id="countdown-text">—</span>
+    </div>
+  </div>
+
+  <div id="reminder-banner"></div>
+
+  <div class="section-title">Révision du jour</div>
+  <div class="today-card container" id="today-card">
+    <div class="day-label" id="today-day-label">Jour —</div>
+    <h3 id="today-title">—</h3>
+    <div class="packs-list" id="today-packs-list">—</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="today-progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="today-progress-label">0 cartes étudiées aujourd'hui</div>
+    <button class="btn-today" id="btn-start-today" onclick="startTodaySession()">▶ Commencer la révision du jour</button>
+  </div>
+
+  <div class="stats-row container">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-mastered">0</div>
+      <div class="stat-lbl">cartes maîtrisées<br>(niveaux 4-5)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-towork">0</div>
+      <div class="stat-lbl">cartes à<br>retravailler</div>
+    </div>
+  </div>
+
+  <div class="section-title">Révision libre</div>
+  <div class="free-card container">
+    <h3>Choisir un paquet</h3>
+    <p>Révise librement sans affecter ton planning. Choisis un ou plusieurs paquets.</p>
+    <div class="pack-chips" id="free-pack-chips"></div>
+    <button class="btn btn-sage" onclick="startFreeSession()">▶ Lancer la révision libre</button>
+  </div>
+
+  <div class="section-title">Planning complet</div>
+  <div class="planning-card container">
+    <h3>Les 20 prochains jours</h3>
+    <div id="planning-list">—</div>
+  </div>
+
+  <div style="height:100px"></div>
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showDash()"><span class="nav-icon">🏠</span>Accueil</button>
+    <button class="nav-btn" onclick="showRules()"><span class="nav-icon">💡</span>Comment ça marche</button>
+    <button class="nav-btn" onclick="showProfile()"><span class="nav-icon">📊</span>Progression</button>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 4 — STUDY
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-study">
+  <div class="study-header container">
+    <button class="back-btn" onclick="exitStudy()">←</button>
+    <h2 id="study-title">Révision</h2>
+  </div>
+  <div class="study-progress container">
+    <div class="progress-track"><div class="progress-fill" id="study-progress-fill" style="width:0%"></div></div>
+    <div class="progress-txt">
+      <span id="study-progress-txt">Carte 0 / 0</span>
+      <span id="study-mode-badge">—</span>
+    </div>
+  </div>
+
+  <!-- CHAPTER INDICATOR -->
+  <div style="text-align:center;padding:0 24px 16px;">
+    <span class="chapter-badge" id="chapter-badge">—</span>
+  </div>
+
+  <!-- CARD — centré verticalement -->
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:0 24px 16px;">
+    <div class="card-scene-centered" id="card-scene" onclick="flipCard()">
+      <div class="card-3d" id="card-3d">
+        <div class="card-face card-front">
+          <div class="leitner-badge lv1" id="card-lv-badge">1</div>
+          <div class="card-label">Question</div>
+          <div class="card-text" id="card-front-text">—</div>
+          <div class="card-hint">Appuie pour voir la réponse</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-label">Réponse</div>
+          <div class="card-text" id="card-back-text">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer-btns-centered" id="answer-btns" style="display:none;">
+      <button class="btn-didnt" onclick="answerCard(false)">✗ Je ne savais pas</button>
+      <button class="btn-knew" onclick="answerCard(true)">✓ Je savais !</button>
+    </div>
+    <div class="answer-hint" id="answer-hint">Appuie sur la carte pour révéler la réponse</div>
+  </div>
+
+  <!-- SESSION END -->
+  <div class="session-end container fade-in" id="session-end" style="display:none;">
+    <div class="end-icon">🎉</div>
+    <h2 id="end-title">Bravo !</h2>
+    <p id="end-message">—</p>
+    <div class="result-chips">
+      <div class="result-chip chip-green" id="end-knew">✓ 0 cartes</div>
+      <div class="result-chip chip-red" id="end-didnt">✗ 0 cartes</div>
+    </div>
+    <div class="tomorrow-box" id="tomorrow-box">
+      <div class="tmw-label">Au programme demain</div>
+      <div class="tmw-content" id="tomorrow-content">—</div>
+    </div>
+    <button class="btn btn-primary" onclick="exitStudy()" style="width:100%">Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 5 — PROFILE
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="profile-header container">
+    <h2>Ma progression</h2>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-card">
+      <h4>Mon compte</h4>
+      <div class="profile-row"><span class="pr-label">Prénom</span><span class="pr-value" id="prof-name">—</span></div>
+      <div class="profile-row"><span class="pr-label">Date d'évaluation</span><span class="pr-value" id="prof-date">—</span></div>
+      <div class="profile-row"><span class="pr-label">Jours restants</span><span class="pr-value" id="prof-days">—</span></div>
+      <button class="btn-sm-block btn-secondary" onclick="changeDate()">Modifier la date d'évaluation</button>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-card">
+      <h4>Mes boîtes Leitner</h4>
+      <div class="leitner-bars" id="leitner-bars"></div>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-card">
+      <h4>Statistiques</h4>
+      <div class="profile-row"><span class="pr-label">Sessions effectuées</span><span class="pr-value" id="prof-sessions">0</span></div>
+      <div class="profile-row"><span class="pr-label">Cartes vues au total</span><span class="pr-value" id="prof-cards-seen">0</span></div>
+      <div class="profile-row"><span class="pr-label">Taux de réussite</span><span class="pr-value" id="prof-rate">—</span></div>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-card">
+      <h4>Réinitialisation</h4>
+      <button class="btn-sm-block btn-danger" onclick="resetProgress()">Recommencer depuis le début</button>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    <div class="profile-card">
+      <h4>Déconnexion</h4>
+      <p style="font-size:13px;color:var(--mid);margin-bottom:12px;line-height:1.5">Ta progression est sauvegardée. Tu pourras te reconnecter avec ton prénom.</p>
+      <button class="btn-sm-block btn-secondary" onclick="handleLogout()">Se déconnecter</button>
+    </div>
+  </div>
+
+  <div style="height:100px"></div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showDash()"><span class="nav-icon">🏠</span>Accueil</button>
+    <button class="nav-btn" onclick="showRules()"><span class="nav-icon">💡</span>Comment ça marche</button>
+    <button class="nav-btn active" onclick="showProfile()"><span class="nav-icon">📊</span>Progression</button>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 6 — RULES
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-rules">
+  <div class="rules-header container">
+    <h2>Comment ça marche ?</h2>
+    <p>Comprendre la logique des révisions pour mieux les utiliser.</p>
+  </div>
+
+  <div class="rules-section container">
+    <div class="rules-card">
+      <h4>La méthode Leitner</h4>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#F5E6E6">🃏</div>
+        <div class="rule-body">
+          <div class="rule-title">Toutes les cartes ne sont pas égales</div>
+          <div class="rule-desc">Chaque carte a un niveau (1 à 5). Plus le niveau est élevé, moins la carte revient souvent. C'est normal — ça veut dire que tu la maîtrises bien !</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#E8F0E8">✓</div>
+        <div class="rule-body">
+          <div class="rule-title">Si tu savais la réponse</div>
+          <div class="rule-desc">La carte monte d'un niveau. Elle reviendra moins souvent. Tu n'as pas besoin de la revoir aussi vite — ton cerveau l'a bien enregistrée.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#FDF0E0">✗</div>
+        <div class="rule-body">
+          <div class="rule-title">Si tu ne savais pas la réponse</div>
+          <div class="rule-desc">La carte réapparaît une fois à la fin de la session du jour. Si tu la rates encore, elle revient demain au niveau 1. Pas de panique — c'est fait pour ça !</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#E0EAF5">📅</div>
+        <div class="rule-body">
+          <div class="rule-title">Maximum 30 cartes par jour</div>
+          <div class="rule-desc">L'application ne te donnera jamais plus de 30 cartes en révision guidée. Si tu en as moins, c'est que tu t'en sors très bien !</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-section container">
+    <div class="rules-card">
+      <h4>Les niveaux et leurs intervalles</h4>
+      <table class="leitner-table">
+        <tr>
+          <th>Niveau</th>
+          <th>Signification</th>
+          <th>Revient dans</th>
+        </tr>
+        <tr>
+          <td><span class="lv-pill lv1">1</span></td>
+          <td>À apprendre</td>
+          <td>1 jour</td>
+        </tr>
+        <tr>
+          <td><span class="lv-pill lv2">2</span></td>
+          <td>Vu une fois</td>
+          <td>2 jours</td>
+        </tr>
+        <tr>
+          <td><span class="lv-pill lv3">3</span></td>
+          <td>En cours d'apprentissage</td>
+          <td>4 jours</td>
+        </tr>
+        <tr>
+          <td><span class="lv-pill lv4">4</span></td>
+          <td>Bien mémorisé</td>
+          <td>7 jours</td>
+        </tr>
+        <tr>
+          <td><span class="lv-pill lv5">5</span></td>
+          <td>Maîtrisé !</td>
+          <td>14 jours</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="rules-section container">
+    <div class="rules-card">
+      <h4>Révision guidée vs révision libre</h4>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#F2C4B8">📅</div>
+        <div class="rule-body">
+          <div class="rule-title">Révision guidée (planning du jour)</div>
+          <div class="rule-desc">L'application choisit les cartes pour toi selon ton planning. Tes réponses modifient les niveaux Leitner. C'est la révision principale — fais-la en premier !</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#C8DEC5">🆓</div>
+        <div class="rule-body">
+          <div class="rule-title">Révision libre</div>
+          <div class="rule-desc">Tu choisis le paquet que tu veux revoir. Tes réponses ne modifient pas les niveaux Leitner — c'est juste pour t'entraîner quand tu en as envie.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-section container">
+    <div class="rules-card">
+      <h4>Conseils pour bien réviser</h4>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#EDE5D4">⏰</div>
+        <div class="rule-body">
+          <div class="rule-title">Révise un peu chaque jour</div>
+          <div class="rule-desc">10-15 minutes par jour valent mieux qu'une heure la veille. La répétition espacée ne fonctionne que si tu respectes le rythme !</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#EDE5D4">🤔</div>
+        <div class="rule-body">
+          <div class="rule-title">Réfléchis avant de retourner la carte</div>
+          <div class="rule-desc">Essaie toujours de formuler une réponse dans ta tête avant de voir la correction. Même si tu n'es pas sûre — c'est ce qui ancre la mémoire !</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon" style="background:#EDE5D4">✅</div>
+        <div class="rule-body">
+          <div class="rule-title">Sois honnête avec toi-même</div>
+          <div class="rule-desc">Ne clique sur "Je savais" que si tu avais vraiment la bonne réponse. Tricher ne trompe que toi — et c'est ton évaluation qui en dépend !</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:100px"></div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showDash()"><span class="nav-icon">🏠</span>Accueil</button>
+    <button class="nav-btn active"><span class="nav-icon">💡</span>Comment ça marche</button>
+    <button class="nav-btn" onclick="showProfile()"><span class="nav-icon">📊</span>Progression</button>
+  </nav>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA — FLASHCARDS
+// ════════════════════════════════════════
+const PACKS = [
+  {id:"peau", title:"La peau", short:"Peau", startLevel:1, cards:[
+    {id:"peau-01",front:"Quelles sont les 2 grandes caractéristiques de l'épiderme en tant que tissu épithélial ?",back:"1. Tissu avasculaire (pas de vaisseaux sanguins)\n2. Tissu à renouvellement cellulaire continu"},
+    {id:"peau-02",front:"Cite les 5 sous-couches de l'épiderme, de la plus profonde à la plus superficielle.",back:"Basale (1 couche) → Épineuse (5-15 couches) → Granuleuse (3-5 couches) → Claire (2-3 couches) → Cornée (20-30 couches)"},
+    {id:"peau-03",front:"Quelle est la cellule majoritaire de l'épiderme ? Où se trouve-t-elle et quel est son rôle ?",back:"Le kératinocyte. Présent dans toutes les couches. Produit la kératine → forme la barrière protectrice."},
+    {id:"peau-04",front:"Qu'est-ce qu'un mélanocyte ? Où est-il localisé et quel est son rôle ?",back:"Cellule de la couche basale. Produit la mélanine → pigmentation + protection UV."},
+    {id:"peau-05",front:"Qu'est-ce qu'une cellule de Langerhans ? Où est-elle localisée et quel est son rôle ?",back:"Cellule immunitaire. Couche épineuse. Détecte les agents pathogènes et déclenche la défense immunitaire."},
+    {id:"peau-06",front:"Qu'est-ce qu'une cellule de Merkel ? Où est-elle localisée et quel est son rôle ?",back:"Cellule sensorielle. Couche basale. Récepteur du toucher (pressions légères)."},
+    {id:"peau-07",front:"Contre quelles agressions l'épiderme nous protège-t-il ?",back:"Agressions mécaniques, chimiques, biologiques (bactéries/virus), UV, déshydratation."},
+    {id:"peau-08",front:"Qu'est-ce qu'un cornéocyte ?",back:"Kératinocyte arrivé à maturité, mort et aplati, dans la couche cornée, rempli de kératine, éliminé par desquamation."},
+    {id:"peau-09",front:"Dans quelle couche se trouvent les kératinocytes les plus jeunes ? Et les plus vieux ?",back:"Plus jeunes : couche basale. Plus vieux : couche cornée (devenus cornéocytes)."},
+    {id:"peau-10",front:"Pourquoi l'épiderme est-il dit « avasculaire » ? Comment est-il nourri ?",back:"Pas de vaisseaux sanguins. Nourri par diffusion depuis les vaisseaux du derme."}
+  ]},
+  {id:"renouvellement", title:"Renouvellement cellulaire", short:"Renouvellement", startLevel:1, cards:[
+    {id:"renouv-01",front:"Pourquoi le renouvellement cellulaire de l'épiderme est-il nécessaire ?",back:"Les kératinocytes meurent en remontant vers la surface → sans renouvellement, l'épiderme ne peut plus assurer sa fonction de barrière."},
+    {id:"renouv-02",front:"Quelle est la durée moyenne d'un renouvellement cellulaire complet ?",back:"21 à 28 jours (3-4 semaines). Augmente avec l'âge."},
+    {id:"renouv-03",front:"Quelles sont les 2 structures qui assurent la cohésion des cornéocytes ?",back:"1. Le ciment lipidique (mélange de lipides entre les cornéocytes)\n2. Les cornéodesmosomes (liaisons protéiques entre cornéocytes)"},
+    {id:"renouv-04",front:"Quelles sont les conditions nécessaires à la desquamation ?",back:"Des enzymes spécifiques (actives grâce à une hydratation suffisante de la couche cornée) qui coupent les cornéodesmosomes."},
+    {id:"renouv-05",front:"Quel est le mode d'action général des exfoliants ?",back:"Faciliter l'élimination des cornéocytes superficiels en détruisant le ciment lipidique et/ou les cornéodesmosomes."},
+    {id:"renouv-06",front:"Qu'arrive-t-il au renouvellement cellulaire après une exfoliation ?",back:"Il s'accélère : enlever des cornéocytes envoie un signal à la couche basale pour « compenser »."},
+    {id:"renouv-07",front:"Comment agissent les exfoliants mécaniques à particules ?",back:"Par frottement : les particules abrasives fragilisent mécaniquement le ciment lipidique et les cornéodesmosomes."},
+    {id:"renouv-08",front:"Comment agissent les exfoliants mécaniques à gommes ?",back:"Les gommes adhèrent aux cornéocytes puis se détachent en les emportant avec elles. Pas besoin de frotter fort."},
+    {id:"renouv-09",front:"Comment agissent les exfoliants chimiques acides ?",back:"Les acides détruisent chimiquement le ciment lipidique et les cornéodesmosomes. Pas de frottement nécessaire."},
+    {id:"renouv-10",front:"Qu'est-ce qu'une enzyme ? Comment agissent les exfoliants enzymatiques ?",back:"Enzyme = molécule qui accélère une réaction chimique spécifique. Les enzymes exfoliantes coupent les liaisons protéiques des cornéodesmosomes. Très doux."},
+    {id:"renouv-11",front:"Cite 3 exemples d'exfoliants mécaniques à particules.",back:"Cristaux de sel marin, cristaux de sucre, poudre de noyaux d'abricots, microbilles de silice…"},
+    {id:"renouv-12",front:"Cite les 2 exfoliants enzymatiques à connaître. D'où viennent-ils ?",back:"Bromélaïne (ananas) et Papaïne (papaye)."}
+  ]},
+  {id:"hydratation", title:"Hydratation cutanée", short:"Hydratation", startLevel:1, cards:[
+    {id:"hydra-01",front:"Qu'est-ce que la perte insensible en eau (PIE) ? Quel est son trajet ?",back:"Eau qui s'évapore en permanence de la peau sans qu'on le ressente. Trajet : derme → épiderme (basale → épineuse → granuleuse → cornée) → surface → atmosphère."},
+    {id:"hydra-02",front:"Pourquoi la PIE est-elle importante pour l'épiderme ?",back:"C'est elle qui hydrate les cellules épidermiques de l'intérieur (l'épiderme est avasculaire)."},
+    {id:"hydra-03",front:"Cite les différents mécanismes d'hydratation de l'épiderme.",back:"1. PIE\n2. NMF (substances hygroscopiques naturelles dans les cornéocytes)\n3. Film hydrolipidique (limite l'évaporation en surface)\n4. Ciment lipidique (retient l'eau entre les cornéocytes)"},
+    {id:"hydra-04",front:"Quelle est la différence entre une peau sèche et une peau déshydratée ?",back:"Sèche = manque de lipides (sébum). Déshydratée = manque d'eau (peut toucher tout type de peau)."},
+    {id:"hydra-05",front:"Qu'est-ce qu'un produit « hydratant » ? Quel principe actif contient-il ?",back:"Contient des humectants : molécules hygroscopiques qui attirent et retiennent l'eau dans l'épiderme."},
+    {id:"hydra-06",front:"Qu'est-ce qu'un produit « nourrissant/riche » ? Quels principes actifs contient-il ?",back:"Contient des émollients et/ou des occlusifs : principes actifs hydrophobes qui agissent sur les lipides de la peau."},
+    {id:"hydra-07",front:"Comment agissent les principes actifs humectants ?",back:"Ils attirent et retiennent l'eau. Selon leur taille, ils agissent en surface ou en profondeur dans l'épiderme."},
+    {id:"hydra-08",front:"Quelle est la différence entre l'acide hyaluronique à haut et à bas poids moléculaire ?",back:"Haut PM = reste en surface (film protecteur). Bas PM = pénètre en profondeur dans l'épiderme."},
+    {id:"hydra-09",front:"Comment agissent les principes actifs émollients ?",back:"Ils s'intègrent entre les cornéocytes et dans le ciment lipidique → rendent la peau souple et douce."},
+    {id:"hydra-10",front:"Comment agissent les principes actifs occlusifs ?",back:"Ils forment un film imperméable (filmogène) en surface qui bloque l'évaporation de l'eau."},
+    {id:"hydra-11",front:"Compare avantages et inconvénients des émollients vs occlusifs.",back:"Émollients : texture légère, pénètre bien / moins efficace contre la déshydratation.\nOcclusifs : très efficaces / texture lourde, peut obstruer les pores."}
+  ]},
+  {id:"cosmetologie", title:"Formes cosmétologiques", short:"Formes cosméto", startLevel:1, cards:[
+    {id:"cosm-01",front:"Caractéristiques d'une lotion ?",back:"Excipient : eau. PA : hydrophiles. Texture : très liquide. Aspect : transparent."},
+    {id:"cosm-02",front:"Caractéristiques d'une huile cosmétique ?",back:"Excipient : solvants gras. PA : hydrophobes. Texture : légèrement visqueuse. Aspect : transparent."},
+    {id:"cosm-03",front:"Comment définit-on un sérum ?",back:"Forme concentrée en principes actifs, excipient minimal, texture légère, pénètre rapidement. Haute efficacité."},
+    {id:"cosm-04",front:"Comment distinguer crème, lait et fluide ?",back:"Les 3 sont des émulsions (eau + huile).\nCrème = plus de phase grasse (épaisse).\nLait = équilibrée (fluide).\nFluide = plus d'eau (très fluide, légère)."}
+  ]},
+  {id:"cellulite", title:"La cellulite", short:"Cellulite", startLevel:1, cards:[
+    {id:"cell-01",front:"Qu'est-ce qu'un adipocyte ?",back:"Cellule sphérique de l'hypoderme spécialisée dans le stockage des lipides, contenant une vacuole lipidique (jusqu'à 90% de la cellule)."},
+    {id:"cell-02",front:"Décris la composition et la structure de l'hypoderme.",back:"Tissu conjonctif sous-cutané composé principalement d'adipocytes, organisés en lobules graisseux séparés par des cloisons de collagène."},
+    {id:"cell-03",front:"Cite les principaux rôles de l'hypoderme.",back:"Stockage énergétique / Amortisseur / Immunitaire / Thermorégulation / Esthétique (modelage silhouette) / Sécrétoire (hormones)"},
+    {id:"cell-04",front:"Définis lipolyse et lipogenèse. Quel équilibre existe entre les deux ?",back:"Lipolyse = dégradation/déstockage des lipides. Lipogenèse = fabrication/stockage des lipides. Équilibre = masse graisseuse stable. Si lipogenèse > lipolyse → accumulation de graisses."},
+    {id:"cell-05",front:"Comment la graisse se répartit-elle différemment chez l'homme et la femme ?",back:"Femme : répartition gynoïde = sous la ceinture (hanches, fesses, cuisses).\nHomme : répartition androïde = au-dessus de la ceinture (abdomen)."},
+    {id:"cell-06",front:"Quels sont les 2 processus de développement des adipocytes ?",back:"Hypertrophie : les adipocytes grossissent (se remplissent de lipides).\nHyperplasie : le nombre d'adipocytes augmente (nouveaux adipocytes recrutés)."},
+    {id:"cell-07",front:"Définis la cellulite. Pourquoi ne se réduit-elle pas à une simple surcharge graisseuse ?",back:"Cellulite = déformation de l'hypoderme visible en surface (aspect « peau d'orange »). Elle peut aussi être due à de la rétention d'eau (aqueuse) ou à de la fibrose (fibreuse)."},
+    {id:"cell-08",front:"Pourquoi les femmes sont-elles plus sujettes à la cellulite que les hommes ?",back:"Cloisons de collagène verticales chez la femme → les adipocytes déforment l'hypoderme verticalement → capitons visibles.\nChez l'homme : cloisons obliques → déformation uniforme."},
+    {id:"cell-09",front:"Définis la cellulite adipeuse. Causes et conséquences ?",back:"Surcharge graisseuse dans l'hypoderme.\nCauses : lipogenèse > lipolyse, hypertrophie et hyperplasie des adipocytes.\nConséquences : capitons, compression des capillaires, inflammations."},
+    {id:"cell-10",front:"Définis la cellulite aqueuse. Causes et conséquences ?",back:"Rétention d'eau (stase de liquide interstitiel).\nCauses : mauvaise circulation de retour veineux et lymphatique.\nConséquences : capitons, inflammations, varices possibles."},
+    {id:"cell-11",front:"Comment une cellulite adipeuse peut-elle mener à une cellulite aqueuse ?",back:"L'hypertrophie et l'hyperplasie des adipocytes compriment les capillaires → blocage du retour veineux et lymphatique → stase des liquides → cellulite aqueuse."},
+    {id:"cell-12",front:"Définis la cellulite fibreuse. Cause et conséquences ?",back:"Cellulite ancienne avec accumulation de fibres de collagène rigides autour des lobules graisseux. Adipocytes emprisonnés → cellulite très difficile à traiter."},
+    {id:"cell-13",front:"Définis la cellulite mixte. Donne un exemple.",back:"Plusieurs types de cellulite présents simultanément. Ex : cellulite adipeuse + aqueuse."},
+    {id:"cell-14",front:"Comment agissent les principes actifs lipolytiques ? Cite 3 exemples.",back:"Ils stimulent la lipolyse (dégradation des lipides dans les adipocytes) → réduction du volume des adipocytes.\nEx : caféine, L-carnitine, extrait de Guarana."}
+  ]},
+  {id:"sanguin", title:"Système sanguin", short:"Sanguin", startLevel:1, cards:[
+    {id:"sang-01",front:"Cite les grands rôles du système sanguin.",back:"Transport O2, nutriments, déchets, hormones / défense immunitaire / thermorégulation."},
+    {id:"sang-02",front:"Caractéristiques et rôle des artères ?",back:"Paroi épaisse et élastique. Transportent le sang du cœur vers les organes (sang oxygéné). Pas de valvules."},
+    {id:"sang-03",front:"Caractéristiques et rôle des artérioles ?",back:"Paroi épaisse et élastique. Peuvent se dilater et se contracter. Répartissent le sang dans les différents tissus."},
+    {id:"sang-04",front:"Caractéristiques et rôle des capillaires sanguins ?",back:"Paroi très fine (1 couche de cellules). Permettent les échanges (O2, nutriments, déchets) entre le sang et les tissus."},
+    {id:"sang-05",front:"Caractéristiques et rôle des veines ?",back:"Paroi fine et peu élastique. Transportent le sang des organes vers le cœur. Contiennent des valvules anti-reflux."},
+    {id:"sang-06",front:"Caractéristiques et rôle des veinules ?",back:"Paroi fine et peu élastique. Récoltent le sang depuis les capillaires et l'acheminent vers les veines."},
+    {id:"sang-07",front:"Qu'est-ce que l'hyperémie ? Comment reconnaît-on une peau hyperémiée ?",back:"Afflux de sang dans les capillaires (vasodilatation). Peau rouge, chaude, légèrement gonflée."},
+    {id:"sang-08",front:"Qu'est-ce que la congestion sanguine ? Comment reconnaît-on une peau congestionnée ?",back:"Accumulation de sang stagnant dans les vaisseaux. Peau rouge-violacée, engorgée."},
+    {id:"sang-09",front:"Cite les 5 grands signes d'une inflammation.",back:"Rougeur / Chaleur / Gonflement (œdème) / Douleur / Perte de fonction"},
+    {id:"sang-10",front:"Quels sont les 2 problèmes du retour du sang veineux (membres inférieurs) ?",back:"1. Gravité : le sang doit remonter contre la gravité.\n2. Pression faible dans les veines (pas de pompe comme le cœur)."},
+    {id:"sang-11",front:"Cite et explique les 5 systèmes qui facilitent le retour veineux.",back:"1. Valvules (anti-reflux)\n2. Contractions musculaires (effet de pompe)\n3. Respiration/diaphragme\n4. Pulsations artérielles (compriment les veines voisines)\n5. Semelle plantaire (pompe lors de la marche)"},
+    {id:"sang-12",front:"Qu'est-ce que l'insuffisance veineuse ? Cause et conséquences ?",back:"Défaillance des valvules → reflux du sang → stase veineuse. Conséquences : varices, œdèmes, douleurs, lourdeurs."},
+    {id:"sang-13",front:"Pourquoi les déformations des veines sont-elles plus problématiques que celles des artères ?",back:"Les veines ont une paroi fine et peu élastique → se dilatent facilement et de façon permanente."},
+    {id:"sang-14",front:"Comment agissent les principes actifs vasoconstricteurs ? Donne 2 exemples.",back:"Ils resserrent les vaisseaux sanguins → réduisent le calibre des capillaires → moins de rougeur/congestion.\nEx : extrait de Cyprès, extrait d'Hamamélis."},
+    {id:"sang-15",front:"Comment agissent les principes actifs anti-inflammatoires ? Donne 2 exemples.",back:"Ils réduisent les 5 signes de l'inflammation.\nEx : extrait d'Aloe Vera, extrait de Calendula."}
+  ]},
+  {id:"lymphatique", title:"Système lymphatique", short:"Lymphatique", startLevel:1, cards:[
+    {id:"lymph-01",front:"Quelle est la différence entre liquide interstitiel et lymphe ?",back:"Liquide interstitiel = liquide baignant tous les tissus. Lymphe = les 10% de liquide interstitiel non récupérés par les capillaires sanguins, collectés par les capillaires lymphatiques."},
+    {id:"lymph-02",front:"Quels sont les principaux composants du liquide interstitiel ?",back:"Eau, nutriments, O2, déchets cellulaires, protéines, CO2."},
+    {id:"lymph-03",front:"Pourquoi la canalisation de la lymphe est-elle nécessaire ?",back:"Sans drainage, le liquide interstitiel en excès s'accumule dans les tissus → œdème."},
+    {id:"lymph-04",front:"Cite les différents types de vaisseaux lymphatiques et leurs caractéristiques.",back:"Capillaires lymphatiques (très fins, en cul-de-sac) → Vaisseaux collecteurs (plus larges, avec valvules) → Conduits lymphatiques (conduit thoracique + conduit lymphatique droit)"},
+    {id:"lymph-05",front:"Quelle est la fin du trajet de la lymphe ? Pourquoi ?",back:"La lymphe rejoint le sang dans les veines sous-clavières → les liquides récupérés retournent dans la circulation sanguine."},
+    {id:"lymph-06",front:"Quels sont les rôles des ganglions lymphatiques ?",back:"1. Relais pour le drainage\n2. Filtration de la lymphe (détection des pathogènes)\n3. Activation des lymphocytes\n4. Passage des lymphocytes dans le sang pour combattre l'infection"},
+    {id:"lymph-07",front:"Cite les 4 grands rôles du système lymphatique.",back:"1. Immunitaire\n2. Drainant (récupère les 10% de liquide en excès)\n3. Récupération des déchets\n4. Nutrition (transport des lipides depuis les intestins)"},
+    {id:"lymph-08",front:"Quels sont les 2 principaux problèmes du retour lymphatique ?",back:"1. Pas d'organe comme le cœur pour propulser la lymphe.\n2. La gravité s'oppose au retour de la lymphe dans la partie basse du corps."},
+    {id:"lymph-09",front:"Cite les systèmes qui facilitent le retour lymphatique.",back:"1. Semelle plantaire (marche)\n2. Contractions musculaires\n3. Respiration/diaphragme\n4. Pulsations artérielles\n5. Valvules dans les vaisseaux lymphatiques"},
+    {id:"lymph-10",front:"Quelle différence structurelle entre capillaires sanguins et capillaires lymphatiques ?",back:"Capillaires sanguins : circuit en boucle. Capillaires lymphatiques : extrémité en cul-de-sac (pas de circuit fermé)."},
+    {id:"lymph-11",front:"Quelles zones du corps sont drainées par le conduit thoracique ? Et par le conduit lymphatique droit ?",back:"Conduit thoracique : tout le corps SAUF la partie haute droite.\nConduit lymphatique droit : côté droit du thorax, du cou et du bras droit."},
+    {id:"lymph-12",front:"Où débouchent les 2 conduits lymphatiques principaux ?",back:"Conduit thoracique → veine sous-clavière gauche.\nConduit lymphatique droit → veine sous-clavière droite."},
+    {id:"lymph-13",front:"Comment agissent les principes actifs favorisant le retour veineux et lymphatique ? Donne 2 exemples.",back:"Effet vasoconstricteur et/ou décongestionnant : resserrent les vaisseaux et améliorent leur tonus.\nEx : extrait de Marron d'Inde, extrait de Ginkgo Biloba."},
+    {id:"lymph-14",front:"Sur un schéma du corps, que doit-on légender spontanément (système lymphatique) ?",back:"Les 2 conduits lymphatiques, les 2 veines sous-clavières, la citerne du chyle, les zones drainées par chaque conduit, les principaux ganglions lymphatiques."}
+  ]}
+];
+
+// Leitner intervals (days)
+const LEITNER_INTERVALS = [0, 1, 2, 4, 7, 14];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let state = null;
+let currentSession = null;
+let selectedFreePacks = [];
+
+function getStorageKey(name) { return 'uaa4_' + name.trim().toLowerCase().replace(/\s+/g, '_'); }
+
+function loadState(name) {
+  try {
+    const key = getStorageKey(name);
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Vérification minimale que c'est bien un état valide
+    if (!parsed || !parsed.name || !parsed.cardStates) return null;
+    return parsed;
+  } catch(e) {
+    console.warn('loadState error:', e);
+    return null;
+  }
+}
+
+function saveState() {
+  if (!state) return;
+  try {
+    const key = getStorageKey(state.name);
+    localStorage.setItem(key, JSON.stringify(state));
+    localStorage.setItem('uaa4_last_user', state.name);
+    localStorage.setItem('uaa4_last_seen', Date.now().toString());
+  } catch(e) {
+    console.warn('saveState error:', e);
+  }
+}
+
+function initState(name) {
+  const cardStates = {};
+  PACKS.forEach(pack => {
+    pack.cards.forEach(card => {
+      cardStates[card.id] = {
+        level: pack.startLevel,
+        nextReview: 0
+      };
+    });
+  });
+  return {
+    name,
+    evalDate: null,
+    startDate: Date.now(),
+    cardStates,
+    todayProgress: { date: '', seen: 0, sessionTotal: 0, completedIds: [], sessionCardIds: [] },
+    stats: { sessions: 0, cardsSeen: 0, knew: 0, didnt: 0 }
+  };
+}
+
+// Retourne la liste fixe des cartes du jour (générée une seule fois par jour)
+function getTodaySessionCards(packIds, dayIndex) {
+  const todayKey = new Date().toISOString().split('T')[0];
+
+  // Initialiser todayProgress si nouveau jour
+  if (state.todayProgress.date !== todayKey) {
+    state.todayProgress = { date: todayKey, seen: 0, sessionTotal: 0, completedIds: [], sessionCardIds: [] };
+  }
+
+  const completedIds = state.todayProgress.completedIds || [];
+
+  // Si la liste du jour est déjà fixée, on la reconstitue depuis les IDs stockés
+  // en excluant les cartes déjà complétées
+  if (state.todayProgress.sessionCardIds && state.todayProgress.sessionCardIds.length > 0) {
+    const remainingIds = state.todayProgress.sessionCardIds.filter(id => !completedIds.includes(id));
+    const cards = [];
+    remainingIds.forEach(id => {
+      for (const packId of packIds) {
+        const pack = PACKS.find(p => p.id === packId);
+        if (!pack) continue;
+        const card = pack.cards.find(c => c.id === id);
+        if (card) {
+          const cs = state.cardStates[card.id];
+          cards.push({ ...card, packId, level: cs ? cs.level : 1 });
+          break;
+        }
+      }
+    });
+    return cards;
+  }
+
+  // Première fois aujourd'hui : générer la liste et la fixer
+  const cards = getCardsForToday(packIds, dayIndex);
+  state.todayProgress.sessionCardIds = cards.map(c => c.id);
+  state.todayProgress.sessionTotal = cards.length;
+  saveState();
+  return cards;
+}
+
+// ════════════════════════════════════════
+// PLANNING
+// ════════════════════════════════════════
+// Pack introduction schedule (by day index 0-based, no Sundays)
+// Day 0-1: peau+renouvellement+hydratation+cosmetologie
+// Day 2-3: + cellulite
+// Day 4+: + sanguin + lymphatique
+// Final days: all packs consolidation
+
+function getActivePacks(dayIndex) {
+  const early = ['peau','renouvellement','hydratation','cosmetologie'];
+  const mid = ['cellulite'];
+  const late = ['sanguin','lymphatique'];
+  if (dayIndex < 0) return [];
+  if (dayIndex <= 1) return early;
+  if (dayIndex <= 3) return [...early, ...mid];
+  return [...early, ...mid, ...late];
+}
+
+function getDayDescription(dayIndex, totalDays) {
+  const packs = getActivePacks(dayIndex);
+  if (dayIndex >= totalDays - 1) return '🌟 Dernier tour — toutes les cartes difficiles';
+  if (dayIndex >= totalDays - 3) return '🔄 Révision finale — tous les paquets';
+  const names = packs.map(id => PACKS.find(p=>p.id===id)?.short || id);
+  return names.join(' · ');
+}
+
+function getWorkingDays(startDate, evalDate) {
+  // Returns array of Date objects (no Sundays) between start and day before eval
+  const days = [];
+  const end = new Date(evalDate);
+  end.setDate(end.getDate() - 1); // day before eval = last study day
+  let d = new Date(startDate);
+  d.setHours(0,0,0,0);
+  while (d <= end) {
+    if (d.getDay() !== 0) days.push(new Date(d)); // skip Sundays
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+function getTodayDayIndex() {
+  if (!state || !state.evalDate) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(state.startDate); start.setHours(0,0,0,0);
+  const days = getWorkingDays(start, state.evalDate);
+  return days.findIndex(d => d.getTime() === today.getTime());
+}
+
+function getDaysUntilEval() {
+  if (!state || !state.evalDate) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const eval_ = new Date(state.evalDate); eval_.setHours(0,0,0,0);
+  const diff = Math.round((eval_ - today) / 86400000);
+  return diff;
+}
+
+// ════════════════════════════════════════
+// LEITNER LOGIC
+// ════════════════════════════════════════
+function getCardsForToday(packIds, dayIndex) {
+  const today = Date.now();
+  // Cartes déjà réussies aujourd'hui à exclure
+  const completedIds = (state.todayProgress && state.todayProgress.completedIds) || [];
+  const reviewCards = [];
+  const newCards = [];
+
+  packIds.forEach(packId => {
+    const pack = PACKS.find(p => p.id === packId);
+    if (!pack) return;
+    pack.cards.forEach(card => {
+      if (completedIds.includes(card.id)) return; // déjà réussie aujourd'hui
+      const cs = state.cardStates[card.id];
+      if (!cs) return;
+      if (cs.nextReview <= today) {
+        if (cs.nextReview === 0) {
+          newCards.push({ ...card, packId, level: cs.level });
+        } else {
+          reviewCards.push({ ...card, packId, level: cs.level });
+        }
+      }
+    });
+  });
+
+  // Limite de nouvelles cartes par jour
+  const isFirstDay = (dayIndex === 0);
+  const maxNew = isFirstDay ? 20 : 10;
+  const limitedNew = newCards.sort(() => Math.random() - 0.5).slice(0, maxNew);
+
+  // Priorité aux révisions, puis nouvelles cartes, total plafonné à 30
+  const MAX_TOTAL = 30;
+  let combined = [...reviewCards, ...limitedNew];
+  if (combined.length > MAX_TOTAL) {
+    const revCapped = reviewCards.slice(0, MAX_TOTAL);
+    const newSlots = Math.max(0, MAX_TOTAL - revCapped.length);
+    combined = [...revCapped, ...limitedNew.slice(0, newSlots)];
+  }
+
+  return combined.sort(() => Math.random() - 0.5);
+}
+
+function updateCardLevel(cardId, knew) {
+  const cs = state.cardStates[cardId];
+  if (!cs) return;
+  if (knew) {
+    cs.level = Math.min(5, cs.level + 1);
+  } else {
+    cs.level = 1;
+  }
+  const intervalDays = LEITNER_INTERVALS[cs.level] || 1;
+  cs.nextReview = Date.now() + intervalDays * 86400000;
+  saveState();
+}
+
+function getLeitnerStats() {
+  const counts = [0,0,0,0,0];
+  Object.values(state.cardStates).forEach(cs => {
+    counts[cs.level - 1]++;
+  });
+  return counts;
+}
+
+// ════════════════════════════════════════
+// SCREENS
+// ════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════
+function handleLogin() {
+  const name = document.getElementById('input-name').value.trim();
+  if (!name) { showToast('Entre ton prénom pour continuer !'); return; }
+
+  const existing = loadState(name);
+  if (existing) {
+    state = existing;
+    showDash();
+  } else {
+    state = initState(name);
+    saveState(); // ← sauvegarde immédiate dès la création
+    document.getElementById('date-name').textContent = name;
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    document.getElementById('input-date').min = tomorrow.toISOString().split('T')[0];
+    showScreen('date');
+  }
+}
+
+// ════════════════════════════════════════
+// DATE SETUP
+// ════════════════════════════════════════
+function handleDateSet() {
+  const d = document.getElementById('input-date').value;
+  if (!d) { showToast('Sélectionne une date !'); return; }
+  state.evalDate = new Date(d).getTime();
+  state.startDate = Date.now();
+  saveState();
+  showDash();
+}
+
+function handleDateSkip() {
+  state.evalDate = null;
+  saveState();
+  showDash();
+}
+
+function changeDate() {
+  const d = prompt('Entre la date de ton évaluation (format JJ/MM/AAAA) :');
+  if (!d) return;
+  const parts = d.split('/');
+  if (parts.length !== 3) { showToast('Format invalide'); return; }
+  const parsed = new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
+  if (isNaN(parsed)) { showToast('Date invalide'); return; }
+  state.evalDate = parsed.getTime();
+  saveState();
+  renderDashboard();
+  showToast('Date mise à jour !');
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function showDash() {
+  showScreen('dashboard');
+  renderDashboard();
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+}
+
+function showRules() {
+  showScreen('rules');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===1));
+}
+
+function showProfile() {
+  showScreen('profile');
+  renderProfile();
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===2));
+}
+
+function renderDashboard() {
+  if (!state) return;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('dash-greeting').textContent = greeting;
+  document.getElementById('dash-name').textContent = state.name + ' 👋';
+
+  // Countdown
+  const badge = document.getElementById('countdown-badge');
+  const daysLeft = getDaysUntilEval();
+  if (daysLeft === null) {
+    badge.className = 'countdown-badge no-date';
+    document.getElementById('countdown-text').textContent = 'Date d\'évaluation non définie';
+  } else if (daysLeft <= 0) {
+    badge.className = 'countdown-badge';
+    document.getElementById('countdown-text').textContent = daysLeft === 0 ? '🎯 Évaluation aujourd\'hui !' : 'Évaluation passée';
+  } else {
+    badge.className = 'countdown-badge';
+    document.getElementById('countdown-text').textContent = `J-${daysLeft} avant l'évaluation`;
+  }
+
+  // Today card
+  renderTodayCard();
+
+  // Stats
+  const lvStats = getLeitnerStats();
+  document.getElementById('stat-mastered').textContent = lvStats[3] + lvStats[4];
+  document.getElementById('stat-towork').textContent = lvStats[0] + lvStats[1];
+
+  // Free packs chips
+  renderFreePackChips();
+
+  // Planning
+  renderPlanningList();
+}
+
+function renderTodayCard() {
+  const tc = document.getElementById('today-card');
+  const dayIndex = getTodayDayIndex();
+
+  if (!state.evalDate) {
+    document.getElementById('today-day-label').textContent = 'Planning';
+    document.getElementById('today-title').textContent = 'Pas encore de date fixée';
+    document.getElementById('today-packs-list').innerHTML = '<span class="no-date-msg">Va dans "Ma progression" pour entrer la date de ton évaluation.</span>';
+    document.getElementById('today-progress-bar').style.width = '0%';
+    document.getElementById('today-progress-label').textContent = '';
+    document.getElementById('btn-start-today').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('btn-start-today').style.display = 'block';
+
+  if (dayIndex === null || dayIndex < 0) {
+    document.getElementById('today-day-label').textContent = 'Avant le début';
+    document.getElementById('today-title').textContent = 'Pas encore de révision prévue';
+    document.getElementById('today-packs-list').textContent = 'Le planning démarre le ' + new Date(state.startDate).toLocaleDateString('fr-BE');
+    return;
+  }
+
+  const start = new Date(state.startDate); start.setHours(0,0,0,0);
+  const workDays = getWorkingDays(start, state.evalDate);
+  const totalDays = workDays.length;
+
+  if (dayIndex >= totalDays) {
+    document.getElementById('today-day-label').textContent = 'Évaluation passée';
+    document.getElementById('today-title').textContent = 'Bonne chance !';
+    document.getElementById('today-packs-list').textContent = 'Tu as terminé ton planning de révision.';
+    return;
+  }
+
+  const activePacks = getActivePacks(dayIndex);
+
+  // Today progress — getTodaySessionCards gère l'initialisation
+  const sessionCards = getTodaySessionCards(activePacks, dayIndex);
+  const completedIds = state.todayProgress.completedIds || [];
+  const seenCount = completedIds.length;
+  const remaining = sessionCards.length; // déjà filtré des completedIds
+  const totalCount = seenCount + remaining;
+
+  // ── Reminder banner ──
+  const banner = document.getElementById('reminder-banner');
+
+  if (remaining > 0 && seenCount > 0) {
+    const mins = Math.ceil(remaining * 1);
+    const encouragements = [
+      `Tu y es presque ! Plus que ${remaining} carte${remaining>1?'s':''} — ça prend environ ${mins} minute${mins>1?'s':''}.`,
+      `Encore un petit effort ! ${remaining} carte${remaining>1?'s':''} t'attendent — ne lâche pas maintenant !`,
+      `Tu as bien commencé ! Il reste ${remaining} carte${remaining>1?'s':''} pour finir ta session du jour.`,
+      `Presque fini${remaining>1?'e':''} ! ${remaining} carte${remaining>1?'s':''} encore et c'est dans la boîte.`
+    ];
+    const msg = encouragements[Math.floor(Math.random() * encouragements.length)];
+    banner.innerHTML = `
+      <div class="reminder-banner">
+        <div class="rem-icon">⏳</div>
+        <div class="rem-body">
+          <div class="rem-title">Session du jour non terminée</div>
+          <div class="rem-msg">${msg}</div>
+          <button class="rem-btn" onclick="startTodaySession()">▶ Continuer</button>
+        </div>
+      </div>`;
+  } else if (remaining > 0 && seenCount === 0 && state.stats.sessions > 0) {
+    const mins = Math.ceil(remaining * 1);
+    banner.innerHTML = `
+      <div class="reminder-banner">
+        <div class="rem-icon">💪</div>
+        <div class="rem-body">
+          <div class="rem-title">Tu n'as pas encore révisé aujourd'hui</div>
+          <div class="rem-msg">${remaining} carte${remaining>1?'s':''} t'attendent — environ ${mins} minute${mins>1?'s':''}. Lance-toi, tu vas y arriver !</div>
+          <button class="rem-btn" onclick="startTodaySession()">▶ Commencer</button>
+        </div>
+      </div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+
+  document.getElementById('today-day-label').textContent = `Jour ${dayIndex + 1} sur ${totalDays}`;
+  document.getElementById('today-title').textContent = remaining === 0
+    ? '🎉 Objectif du jour atteint !'
+    : `${remaining} carte${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}`;
+
+  const packNames = activePacks.map(id => PACKS.find(p=>p.id===id)?.short || id);
+  document.getElementById('today-packs-list').textContent = packNames.join(' · ');
+
+  const pct = totalCount > 0 ? Math.round(seenCount / totalCount * 100) : 100;
+  document.getElementById('today-progress-bar').style.width = Math.min(100, pct) + '%';
+  document.getElementById('today-progress-label').textContent = remaining === 0
+    ? '✓ Toutes les cartes du jour sont à jour !'
+    : `${seenCount} carte${seenCount > 1 ? 's' : ''} vue${seenCount > 1 ? 's' : ''} · ${remaining} restante${remaining > 1 ? 's' : ''}`;
+}
+
+function renderFreePackChips() {
+  const el = document.getElementById('free-pack-chips');
+  el.innerHTML = PACKS.map(p => `
+    <div class="pack-chip${selectedFreePacks.includes(p.id)?' selected':''}"
+         onclick="toggleFreePack('${p.id}')">${p.short}</div>
+  `).join('');
+}
+
+function toggleFreePack(id) {
+  const idx = selectedFreePacks.indexOf(id);
+  if (idx >= 0) selectedFreePacks.splice(idx, 1);
+  else selectedFreePacks.push(id);
+  renderFreePackChips();
+}
+
+function renderPlanningList() {
+  const el = document.getElementById('planning-list');
+  if (!state.evalDate) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--mid);padding:8px 0;">Entre la date de ton évaluation pour voir le planning.</p>';
+    return;
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayKey = today.toISOString().split('T')[0];
+  const start = new Date(state.startDate); start.setHours(0,0,0,0);
+  const eval_ = new Date(state.evalDate); eval_.setHours(0,0,0,0);
+  const workDays = getWorkingDays(start, state.evalDate);
+  const totalDays = workDays.length;
+
+  // Paquets prioritaires pour l'évaluation
+  const priorityPacks = ['sanguin','lymphatique','cellulite'];
+
+  let html = '';
+  let workIdx = 0;
+  let d = new Date(start);
+  let rendered = 0;
+
+  while (d <= eval_ && rendered < 30) {
+    const isSunday = d.getDay() === 0;
+    const isToday = d.getTime() === today.getTime();
+    const isPast = d < today;
+    const isEval = d.getTime() === eval_.getTime();
+    const dateStr = d.toLocaleDateString('fr-BE', { weekday:'short', day:'numeric', month:'short' });
+    const dayKey = d.toISOString().split('T')[0];
+
+    if (isEval) {
+      html += `
+        <div class="planning-day today">
+          <div class="day-dot" style="background:var(--rose-deep);color:white">🎯</div>
+          <div class="day-info">
+            <div class="day-date">${dateStr}</div>
+            <div class="day-content" style="color:var(--rose-deep);font-weight:500">Jour de l'évaluation !</div>
+          </div>
+        </div>`;
+      rendered++; d = new Date(d); d.setDate(d.getDate()+1);
+      continue;
+    }
+
+    if (isSunday) {
+      html += `
+        <div class="planning-day rest">
+          <div class="day-dot">☀️</div>
+          <div class="day-info">
+            <div class="day-date">${dateStr}</div>
+            <div class="day-content">Repos</div>
+          </div>
+        </div>`;
+      rendered++; d = new Date(d); d.setDate(d.getDate()+1);
+      continue;
+    }
+
+    const wi = workIdx;
+    workIdx++;
+    const cls = isToday ? 'today' : isPast ? 'past' : 'future';
+    const dotContent = isPast ? '✓' : wi+1;
+    const activePacks = getActivePacks(wi);
+    const hasPriority = activePacks.some(id => priorityPacks.includes(id));
+
+    // Noms des paquets avec highlight prioritaires
+    const packNames = activePacks.map(id => {
+      const pack = PACKS.find(p=>p.id===id);
+      const name = pack?.short || id;
+      const isPrio = priorityPacks.includes(id);
+      return isPrio
+        ? `<span style="color:var(--rose-deep);font-weight:500">⭐ ${name}</span>`
+        : `<span>${name}</span>`;
+    }).join('<span style="color:var(--light)"> · </span>');
+
+    html += `
+      <div class="planning-day ${cls}" style="${hasPriority && !isPast ? 'background:linear-gradient(to right,#FFF8F7,transparent)' : ''}">
+        <div class="day-dot">${dotContent}</div>
+        <div class="day-info" style="flex:1">
+          <div class="day-date">${dateStr}</div>
+          <div class="day-content" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${packNames}</div>
+        </div>
+      </div>`;
+
+    rendered++;
+    d = new Date(d); d.setDate(d.getDate()+1);
+  }
+  el.innerHTML = html || '<p style="font-size:13px;color:var(--mid)">Aucun jour trouvé.</p>';
+}
+
+function handleLogout() {
+  saveState();
+  state = null;
+  currentSession = null;
+  selectedFreePacks = [];
+  localStorage.removeItem('uaa4_last_seen');
+  document.getElementById('input-name').value = localStorage.getItem('uaa4_last_user') || '';
+  showScreen('login');
+  showToast('Tu as été déconnectée. À bientôt !');
+}
+
+// ════════════════════════════════════════
+// STUDY SESSION
+// ════════════════════════════════════════
+function startTodaySession() {
+  if (!state.evalDate) { showToast('Entre d\'abord la date de ton évaluation !'); return; }
+  const dayIndex = getTodayDayIndex();
+  if (dayIndex === null || dayIndex < 0) { showToast('Le planning n\'a pas encore démarré.'); return; }
+
+  const activePacks = getActivePacks(dayIndex);
+  // getTodaySessionCards retourne toujours la même liste fixe pour aujourd'hui
+  const cards = getTodaySessionCards(activePacks, dayIndex);
+
+  if (cards.length === 0) {
+    showToast('🎉 Toutes les cartes du jour sont à jour !');
+    return;
+  }
+  startSession(cards, 'Révision du jour', false);
+}
+
+function startFreeSession() {
+  if (selectedFreePacks.length === 0) {
+    showToast('Sélectionne au moins un paquet !');
+    return;
+  }
+  const cards = [];
+  selectedFreePacks.forEach(packId => {
+    const pack = PACKS.find(p => p.id === packId);
+    if (pack) pack.cards.forEach(c => cards.push({ ...c, packId, level: state.cardStates[c.id]?.level || 1 }));
+  });
+  const shuffled = cards.sort(() => Math.random() - 0.5);
+  startSession(shuffled, 'Révision libre', true);
+}
+
+function startSession(cards, title, isFree) {
+  currentSession = {
+    cards,
+    index: 0,
+    knew: 0,
+    didnt: 0,
+    isFree,
+    title,
+    flipped: false,
+    retriedToday: new Set()
+  };
+
+  // Snapshot du nombre de cartes au démarrage de la session guidée
+  if (!isFree) {
+    const todayKey = new Date().toISOString().split('T')[0];
+    if (state.todayProgress.date !== todayKey) {
+      state.todayProgress = { date: todayKey, seen: 0, sessionTotal: cards.length, completedIds: [] };
+    } else {
+      // Reprendre une session en cours : ajouter les nouvelles cartes au total
+      state.todayProgress.sessionTotal = (state.todayProgress.sessionTotal || 0) + cards.length;
+      if (!state.todayProgress.completedIds) state.todayProgress.completedIds = [];
+    }
+    saveState();
+  }
+
+  document.getElementById('study-title').textContent = title;
+  document.getElementById('study-mode-badge').textContent = isFree ? '🆓 Libre' : '📅 Planifiée';
+  showScreen('study');
+  document.getElementById('session-end').style.display = 'none';
+  document.getElementById('card-scene').style.display = 'block';
+  document.getElementById('answer-btns').style.display = 'none';
+  document.getElementById('answer-hint').style.display = 'block';
+  renderCurrentCard();
+}
+
+function renderCurrentCard() {
+  if (!currentSession) return;
+  const { cards, index } = currentSession;
+  if (index >= cards.length) { endSession(); return; }
+
+  const card = cards[index];
+  const total = cards.length;
+
+  document.getElementById('study-progress-fill').style.width = (index/total*100)+'%';
+  document.getElementById('study-progress-txt').textContent = `Carte ${index+1} / ${total}`;
+
+  const level = card.level || 1;
+  const badge = document.getElementById('card-lv-badge');
+  badge.textContent = level;
+  badge.className = `leitner-badge lv${level}`;
+
+  document.getElementById('card-front-text').textContent = card.front;
+  document.getElementById('card-back-text').textContent = card.back;
+
+  // Chapitre d'appartenance
+  const priorityPacks = ['sanguin','lymphatique','cellulite'];
+  const pack = PACKS.find(p => p.id === card.packId);
+  const chapterBadge = document.getElementById('chapter-badge');
+  if (pack) {
+    const isPrio = priorityPacks.includes(pack.id);
+    chapterBadge.textContent = (isPrio ? '⭐ ' : '') + pack.title;
+    chapterBadge.className = 'chapter-badge' + (isPrio ? ' priority' : '');
+  } else {
+    chapterBadge.textContent = '—';
+    chapterBadge.className = 'chapter-badge';
+  }
+
+  // Reset flip
+  const card3d = document.getElementById('card-3d');
+  card3d.classList.remove('flipped');
+  currentSession.flipped = false;
+  document.getElementById('answer-btns').style.display = 'none';
+  document.getElementById('answer-hint').style.display = 'block';
+}
+
+function flipCard() {
+  if (!currentSession || currentSession.flipped) return;
+  document.getElementById('card-3d').classList.add('flipped');
+  currentSession.flipped = true;
+  document.getElementById('answer-btns').style.display = 'grid';
+  document.getElementById('answer-hint').style.display = 'none';
+}
+
+function answerCard(knew) {
+  if (!currentSession || !currentSession.flipped) return;
+  const card = currentSession.cards[currentSession.index];
+
+  if (!currentSession.isFree) {
+    if (knew) {
+      updateCardLevel(card.id, true);
+      // Marquer la carte comme complétée aujourd'hui
+      const todayKey = new Date().toISOString().split('T')[0];
+      if (state.todayProgress.date === todayKey) {
+        if (!state.todayProgress.completedIds) state.todayProgress.completedIds = [];
+        if (!state.todayProgress.completedIds.includes(card.id)) {
+          state.todayProgress.completedIds.push(card.id);
+        }
+        state.todayProgress.seen++;
+      }
+    } else {
+      if (!currentSession.retriedToday.has(card.id)) {
+        currentSession.retriedToday.add(card.id);
+        const retryCard = { ...card };
+        currentSession.cards.push(retryCard);
+      } else {
+        updateCardLevel(card.id, false);
+        // Carte ratée 2x : quand même comptée comme vue
+        const todayKey = new Date().toISOString().split('T')[0];
+        if (state.todayProgress.date === todayKey) {
+          state.todayProgress.seen++;
+        }
+      }
+    }
+  }
+
+  if (knew) currentSession.knew++;
+  else currentSession.didnt++;
+
+  state.stats.cardsSeen++;
+  if (knew) state.stats.knew++; else state.stats.didnt++;
+  saveState();
+
+  currentSession.index++;
+  renderCurrentCard();
+}
+
+function endSession() {
+  if (!currentSession) return;
+  state.stats.sessions++;
+  saveState();
+
+  document.getElementById('card-scene').style.display = 'none';
+  document.getElementById('answer-btns').style.display = 'none';
+  document.getElementById('answer-hint').style.display = 'none';
+  document.getElementById('session-end').style.display = 'flex';
+
+  const name = state.name;
+  const { knew, didnt, isFree } = currentSession;
+  const total = knew + didnt;
+
+  document.getElementById('end-title').textContent = `Bravo ${name} ! 🎉`;
+  document.getElementById('end-message').textContent = isFree
+    ? `Tu as révisé ${total} cartes en mode libre.`
+    : `Session du jour terminée ! Tu progresses bien.`;
+  document.getElementById('end-knew').textContent = `✓ ${knew} carte${knew>1?'s':''} connue${knew>1?'s':''}`;
+  document.getElementById('end-didnt').textContent = `✗ ${didnt} à retravailler`;
+
+  // Tomorrow
+  const tmw = document.getElementById('tomorrow-content');
+  const dayIndex = getTodayDayIndex();
+  if (dayIndex !== null && state.evalDate) {
+    const start = new Date(state.startDate); start.setHours(0,0,0,0);
+    const workDays = getWorkingDays(start, state.evalDate);
+    let nextWorkIdx = dayIndex + 1;
+    // Skip to next working day
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1); tomorrow.setHours(0,0,0,0);
+    const isTomorrowSunday = tomorrow.getDay() === 0;
+    if (isTomorrowSunday) {
+      tmw.textContent = '☀️ Demain c\'est dimanche — repos mérité !';
+    } else if (nextWorkIdx < workDays.length) {
+      const packs = getActivePacks(nextWorkIdx);
+      const names = packs.map(id => PACKS.find(p=>p.id===id)?.short||id);
+      tmw.textContent = names.join(' · ');
+    } else {
+      tmw.textContent = '🎯 C\'est le grand jour demain !';
+    }
+  } else {
+    document.getElementById('tomorrow-box').style.display = 'none';
+  }
+
+  document.getElementById('study-progress-fill').style.width = '100%';
+}
+
+function exitStudy() {
+  currentSession = null;
+  showDash();
+}
+
+// ════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════
+function renderProfile() {
+  if (!state) return;
+  document.getElementById('prof-name').textContent = state.name;
+  document.getElementById('prof-date').textContent = state.evalDate
+    ? new Date(state.evalDate).toLocaleDateString('fr-BE', {day:'numeric',month:'long',year:'numeric'})
+    : 'Non définie';
+  const daysLeft = getDaysUntilEval();
+  document.getElementById('prof-days').textContent = daysLeft !== null ? (daysLeft > 0 ? `${daysLeft} jours` : daysLeft === 0 ? 'Aujourd\'hui !' : 'Passé') : '—';
+
+  // Leitner bars
+  const counts = getLeitnerStats();
+  const total = counts.reduce((a,b)=>a+b,0);
+  const colors = ['lv1-bar','lv2-bar','lv3-bar','lv4-bar','lv5-bar'];
+  const labels = ['Niv. 1','Niv. 2','Niv. 3','Niv. 4','Niv. 5'];
+  document.getElementById('leitner-bars').innerHTML = counts.map((c,i)=>`
+    <div class="leitner-row">
+      <span class="lv-label">${labels[i]}</span>
+      <div class="lv-bar-wrap"><div class="lv-bar ${colors[i]}" style="width:${total>0?Math.round(c/total*100):0}%"></div></div>
+      <span class="lv-count" style="color:var(--${['rose-deep','gold','sage-deep','mid','mid'][i]})">${c}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('prof-sessions').textContent = state.stats.sessions;
+  document.getElementById('prof-cards-seen').textContent = state.stats.cardsSeen;
+  const rate = state.stats.cardsSeen > 0
+    ? Math.round(state.stats.knew / state.stats.cardsSeen * 100) + '%'
+    : '—';
+  document.getElementById('prof-rate').textContent = rate;
+}
+
+function resetProgress() {
+  if (!confirm('Es-tu sûre de vouloir recommencer depuis le début ? Ta progression sera perdue.')) return;
+  const name = state.name;
+  localStorage.removeItem(getStorageKey(name));
+  state = null;
+  showScreen('login');
+  document.getElementById('input-name').value = '';
+  showToast('Progression réinitialisée');
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════
+const ADMIN_CODE = 'DayBr8k';
+const ADMIN_STORAGE_KEY = 'uaa4_admin_packs';
+let adminPacks = null;
+let adminCurrentPack = 0;
+let adminDirty = false;
+let adminPendingDelete = null;
+
+function showAdminLogin() {
+  showScreen('admin-login');
+  document.getElementById('input-admin-code').value = '';
+}
+
+function handleAdminLogin() {
+  const code = document.getElementById('input-admin-code').value;
+  if (code !== ADMIN_CODE) { showToast('Code incorrect'); return; }
+  // Load admin packs (custom or default)
+  adminPacks = loadAdminPacks();
+  adminCurrentPack = 0;
+  adminDirty = false;
+  showScreen('admin');
+  renderAdminEditor();
+}
+
+function loadAdminPacks() {
+  try {
+    const raw = localStorage.getItem(ADMIN_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  // Deep copy of PACKS
+  return JSON.parse(JSON.stringify(PACKS));
+}
+
+function saveAdminPacks() {
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminPacks));
+  // Also update live PACKS so new sessions use updated cards
+  adminPacks.forEach((ap, i) => {
+    if (PACKS[i]) {
+      PACKS[i].title = ap.title;
+      PACKS[i].short = ap.short;
+      PACKS[i].cards = JSON.parse(JSON.stringify(ap.cards));
+    }
+  });
+}
+
+function renderAdminEditor() {
+  // Tabs
+  document.getElementById('admin-tabs').innerHTML = adminPacks.map((p,i) =>
+    `<button class="admin-tab${i===adminCurrentPack?' active':''}" onclick="adminSwitchPack(${i})">${p.short} <span style="opacity:.6">(${p.cards.length})</span></button>`
+  ).join('');
+
+  // Cards
+  const pack = adminPacks[adminCurrentPack];
+  document.getElementById('admin-card-list').innerHTML = pack.cards.map((c,i) => `
+    <div class="admin-card${false?' open':''}" id="acard-${i}">
+      <div class="admin-card-header" onclick="adminToggleCard(${i})">
+        <span class="admin-card-num">${i+1}</span>
+        <span class="admin-card-preview">${esc2(c.front.length>75?c.front.slice(0,75)+'…':c.front)}</span>
+        <span class="admin-chevron">▾</span>
+      </div>
+      <div class="admin-card-body">
+        <div>
+          <div class="admin-field-label">Question (recto)</div>
+          <textarea class="admin-textarea" rows="3"
+            onchange="adminUpdateCard(${i},'front',this.value)">${esc2(c.front)}</textarea>
+        </div>
+        <div>
+          <div class="admin-field-label">Réponse (verso)</div>
+          <textarea class="admin-textarea" rows="4"
+            onchange="adminUpdateCard(${i},'back',this.value)">${esc2(c.back)}</textarea>
+        </div>
+        <div class="admin-card-actions">
+          <span style="font-size:11px;color:var(--light)">Carte ${i+1} / ${pack.cards.length}</span>
+          <button class="btn-del${adminPendingDelete===adminCurrentPack+'-'+i?' confirm':''}"
+            id="adel-${i}" onclick="adminDeleteCard(${i})">
+            ${adminPendingDelete===adminCurrentPack+'-'+i?'Confirmer':'🗑 Supprimer'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Save bar
+  const bar = document.getElementById('admin-save-bar');
+  bar.classList.toggle('visible', adminDirty);
+}
+
+function esc2(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function adminToggleCard(i) {
+  const el = document.getElementById('acard-'+i);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.admin-card').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) { el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+function adminUpdateCard(i, field, val) {
+  adminPacks[adminCurrentPack].cards[i][field] = val;
+  if (field === 'front') {
+    const p = document.querySelector(`#acard-${i} .admin-card-preview`);
+    if (p) p.textContent = val.length>75 ? val.slice(0,75)+'…' : val;
+  }
+  adminDirty = true;
+  document.getElementById('admin-save-bar').classList.add('visible');
+  document.getElementById('admin-save-msg').textContent = 'Modifications non sauvegardées';
+}
+
+function adminDeleteCard(i) {
+  const key = adminCurrentPack+'-'+i;
+  if (adminPendingDelete === key) {
+    adminPacks[adminCurrentPack].cards.splice(i, 1);
+    adminPendingDelete = null;
+    adminDirty = true;
+    renderAdminEditor();
+  } else {
+    adminPendingDelete = key;
+    const btn = document.getElementById('adel-'+i);
+    if (btn) { btn.classList.add('confirm'); btn.textContent = 'Confirmer'; }
+    setTimeout(() => {
+      if (adminPendingDelete === key) { adminPendingDelete = null; renderAdminEditor(); }
+    }, 3000);
+  }
+}
+
+function adminAddCard() {
+  adminPacks[adminCurrentPack].cards.push({
+    id: 'card-' + Date.now(),
+    front: 'Nouvelle question',
+    back: 'Nouvelle réponse'
+  });
+  adminDirty = true;
+  renderAdminEditor();
+  setTimeout(() => {
+    const last = adminPacks[adminCurrentPack].cards.length - 1;
+    const el = document.getElementById('acard-'+last);
+    if (el) { el.scrollIntoView({behavior:'smooth'}); el.classList.add('open'); }
+  }, 50);
+}
+
+function adminSwitchPack(i) {
+  adminCurrentPack = i;
+  adminPendingDelete = null;
+  renderAdminEditor();
+}
+
+function adminSave() {
+  saveAdminPacks();
+  adminDirty = false;
+  document.getElementById('admin-save-bar').classList.remove('visible');
+  showToast('✓ Flashcards sauvegardées !');
+}
+
+function exitAdmin() {
+  if (adminDirty) {
+    if (!confirm('Tu as des modifications non sauvegardées. Quitter quand même ?')) return;
+  }
+  showScreen('login');
+}
+
+// Load admin packs on start if they exist (so students get updated cards)
+(function() {
+  try {
+    const raw = localStorage.getItem(ADMIN_STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      saved.forEach((sp, i) => {
+        if (PACKS[i]) {
+          PACKS[i].title = sp.title;
+          PACKS[i].short = sp.short;
+          PACKS[i].cards = JSON.parse(JSON.stringify(sp.cards));
+        }
+      });
+    }
+  } catch(e) {}
+})();
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+
+// Reconnexion automatique ou pré-remplissage du prénom
+(function() {
+  try {
+    const lastName = localStorage.getItem('uaa4_last_user');
+    if (!lastName) return;
+
+    // Pré-remplir le champ prénom
+    document.getElementById('input-name').value = lastName;
+
+    // Tentative de reconnexion automatique si session < 24h
+    const existing = loadState(lastName);
+    if (existing) {
+      const lastSeen = localStorage.getItem('uaa4_last_seen');
+      const now = Date.now();
+      const twentyFourH = 24 * 60 * 60 * 1000;
+      if (lastSeen && (now - parseInt(lastSeen)) < twentyFourH) {
+        state = existing;
+        showDash();
+        return;
+      }
+    }
+  } catch(e) {}
+})();
+
+document.getElementById('input-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('input-admin-code').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleAdminLogin();
+});
+</script>
+</body>
+</html>
