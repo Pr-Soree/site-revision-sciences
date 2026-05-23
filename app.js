@@ -127,9 +127,6 @@ function showModes(chapitre) {
       <button class="mode-btn" id="btn-qcm">
         <span class="icon">✏️</span> QCM
       </button>
-      <button class="mode-btn" id="btn-fc">
-        <span class="icon">🃏</span> Flashcards
-      </button>
       ${hasQuiz ? `<button class="mode-btn" id="btn-quiz">
         <span class="icon">🎮</span> Quiz interactif
       </button>` : ''}
@@ -141,10 +138,6 @@ function showModes(chapitre) {
   document.getElementById('btn-qcm').addEventListener('click', () => {
     pushCrumb('QCM', () => startQCM(chPath));
     startQCM(chPath);
-  });
-  document.getElementById('btn-fc').addEventListener('click', () => {
-    pushCrumb('Flashcards', () => startFlashcards(chPath));
-    startFlashcards(chPath);
   });
   if (hasQuiz) {
     document.getElementById('btn-quiz').addEventListener('click', () => {
