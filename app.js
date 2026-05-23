@@ -119,6 +119,7 @@ async function showChapitres(matiere) {
 function showModes(chapitre) {
   const chPath = `${chapitre.basePath}/${chapitre.path}`;
   const hasQuiz = chapitre.id === 'uaa4-modelage';
+  const hasLeitner = chapitre.id === 'uaa4-modelage';
   app.innerHTML = `
     <h2 class="section-title">${chapitre.label}</h2>
     ${chapitre.description ? `<p style="color:var(--muted);margin-bottom:1.5rem">${chapitre.description}</p>` : ''}
@@ -131,6 +132,9 @@ function showModes(chapitre) {
       </button>
       ${hasQuiz ? `<button class="mode-btn" id="btn-quiz">
         <span class="icon">🎮</span> Quiz interactif
+      </button>` : ''}
+      ${hasLeitner ? `<button class="mode-btn" id="btn-leitner">
+        <span class="icon">🧠</span> Flashcards Leitner
       </button>` : ''}
     </div>`;
 
@@ -145,6 +149,11 @@ function showModes(chapitre) {
   if (hasQuiz) {
     document.getElementById('btn-quiz').addEventListener('click', () => {
       window.location.href = 'quiz-principes-actifs-uaa4.html';
+    });
+  }
+  if (hasLeitner) {
+    document.getElementById('btn-leitner').addEventListener('click', () => {
+      window.location.href = 'data/classes/5eq/sa/uaa4-modelage/index.html';
     });
   }
 }
