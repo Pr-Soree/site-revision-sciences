@@ -732,6 +732,34 @@ body {
 }
 .add-card-admin:hover { background: var(--sand-light); }
 
+/* ── ADMIN EXPORT ── */
+.admin-export-section {
+  margin: 12px 20px 0;
+  padding: 16px;
+  background: var(--warm-white);
+  border-radius: var(--radius);
+  border: 1.5px dashed var(--sand);
+}
+.admin-export-section h5 {
+  font-size: 11px; font-weight: 600; color: var(--mid);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+}
+.admin-export-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-export {
+  flex: 1; min-width: 120px;
+  padding: 10px 14px; border: 1.5px solid var(--sand-light);
+  border-radius: var(--radius-sm); background: var(--cream);
+  color: var(--charcoal); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .15s;
+}
+.btn-export:hover { background: var(--sand-light); border-color: var(--sand); }
+.btn-export.json { border-color: #C9903A; color: #7A5000; background: #FDF8EE; }
+.btn-export.json:hover { background: #FDF0D8; }
+.btn-export.csv { border-color: var(--sage); color: var(--sage-deep); background: #F0F7EF; }
+.btn-export.csv:hover { background: #E0EDD8; }
+
 /* ── RULES SCREEN ── */
 #screen-rules { padding-bottom: 100px; }
 .rules-header { padding: 48px 24px 24px; max-width: 520px; margin: 0 auto; }
@@ -970,6 +998,15 @@ body {
   <div class="admin-tabs" id="admin-tabs"></div>
   <div class="admin-card-list" id="admin-card-list"></div>
   <button class="add-card-admin" onclick="adminAddCard()">＋ Ajouter une carte</button>
+
+  <div class="admin-export-section">
+    <h5>Exporter les flashcards</h5>
+    <div class="admin-export-btns">
+      <button class="btn-export json" onclick="adminExportJSON()">⬇ JSON</button>
+      <button class="btn-export csv" onclick="adminExportCSV()">⬇ CSV</button>
+    </div>
+  </div>
+
   <div style="height:140px"></div>
 
   <div class="admin-save-bar" id="admin-save-bar">
@@ -2381,6 +2418,41 @@ function adminSave() {
   adminDirty = false;
   document.getElementById('admin-save-bar').classList.remove('visible');
   showToast('✓ Flashcards sauvegardées !');
+}
+
+function adminExportJSON() {
+  const data = JSON.stringify(adminPacks, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flashcards-uaa4-' + new Date().toISOString().split('T')[0] + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ Export JSON téléchargé !');
+}
+
+function adminExportCSV() {
+  let csv = 'Paquet,Question,Réponse\n';
+  adminPacks.forEach(pack => {
+    pack.cards.forEach(card => {
+      const q = '"' + card.front.replace(/"/g, '""') + '"';
+      const r = '"' + card.back.replace(/"/g, '""') + '"';
+      csv += '"' + pack.title.replace(/"/g, '""') + '",' + q + ',' + r + '\n';
+    });
+  });
+  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flashcards-uaa4-' + new Date().toISOString().split('T')[0] + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ Export CSV téléchargé !');
 }
 
 function exitAdmin() {
